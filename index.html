@@ -93,84 +93,85 @@ button.action{border:0;border-radius:11px;padding:13px 19px;font-size:15px;font-
     <section id="participant" class="section green">
       <h2>👤 Participant Arrival Details</h2>
       <div class="grid">
+        <div class="full">
+          <label>👤 Name of the Hostel Allottee / Arriving Participant *</label>
+          <select name="participant" required>
+            <option value="">-- Select Participant --</option>
+            <optgroup label="Ahmedabad Region">
+              <option>Shri Heraj Ram Chaudhary</option>
+              <option>Shri Dilip D. Chauhan</option>
+              <option>Shri Raval Vyomeshkumar</option>
+              <option>Shri Vinod Kumar Mahawar</option>
+              <option>Shri Shyam Bahadur Yadav</option>
+            </optgroup>
+            <optgroup label="Jaipur Region">
+              <option>Shri Kartar Singh Gurjar</option>
+              <option>Shri Vinay Singh Verma</option>
+              <option>Shri Baboo Singh Rathore</option>
+              <option>Shri Raghunath Ram</option>
+              <option>Shri Mool Singh Shekhawat</option>
+              <option>Shri Om Prakash Jangid</option>
+              <option>Shri Brijendra Kumar Tiwari</option>
+              <option>Shri Neka Ram Ghanchi</option>
+              <option>Shri Hemant Pandya</option>
+              <option>Shri Yogesh Kumar Meena</option>
+              <option>Shri Deepak Kumar Juneja</option>
+              <option>Shri Rajendra Kumar Meena</option>
+              <option>Shri Hukma Ram</option>
+              <option>Shri Rajesh Bagaria</option>
+              <option>Shri Pradeep Choudhary</option>
+            </optgroup>
+            <optgroup label="Mumbai Region">
+              <option>Shri Dinesh Kumar Tank</option>
+              <option>Shri Manoj Kumar Yadav</option>
+              <option>Shri Sunil Bapurao More</option>
+              <option>Shri Nilesh Onkarrao Ambadkar</option>
+              <option>Shri Anil Kumar</option>
+              <option>Shri Rajkumar Gadwal</option>
+              <option>Shri Pagare Amol Phillip</option>
+              <option>Shri Sham Bharat Nikum</option>
+              <option>Shri Amir Husain</option>
+              <option>Shri Gajraj Meena</option>
+              <option>Shri Ramphool Meena</option>
+              <option>Shri Gangadhar Govindrao Bhagat</option>
+              <option>Shri Ashok Kumar Singh</option>
+              <option>Shri Prahlad Verma</option>
+              <option>Balaji Namdeorao Marakwar</option>
+              <option>Shri Arun Kumar</option>
+              <option>Shri Feroz Khan</option>
+            </optgroup>
+            <optgroup label="Patna Region">
+              <option>Shri Maheshwar Prasad Narain Singh</option>
+              <option>Shri Kumar Raghvendra</option>
+              <option>Shri Pawan Kumar Mahto</option>
+              <option>Shri Jitendra Kumar Pandey</option>
+            </optgroup>
+            <optgroup label="Raipur Region">
+              <option>Shri Ravi Shankar Yadav</option>
+            </optgroup>
+          </select>
+          <div class="note">Select the hostel allottee / arriving participant from the feeder-region list.</div>
+        </div>
         <div>
-          <label>👤 Name of the Arriving Participant *</label>
-          <input name="participant" placeholder="Enter participant's full name" required>
+          <label>🏢 Block No. *</label>
+          <select name="block" required>
+            <option value="">-- Select Block --</option>
+            <option>A1</option>
+            <option>A2</option>
+            <option>A3</option>
+          </select>
+        </div>
+        <div>
+          <label>🚪 Room No. *</label>
+          <input name="room" placeholder="Enter allotted room number" required>
         </div>
         <div>
           <label>🕒 Expected Time of Arrival at ZIET Hostel *</label>
-          <input name="arrival" type="datetime-local" required>
-        </div>
-      </div>
-    </section>
-
-    <section id="hostel" class="section orange">
-      <h2>🛏️ Hostel Assistance &amp; Allotment</h2>
-      <div class="grid">
-        <div>
-          <label>🏨 Select Hostel Allottee / Arriving Participant *</label>
-          <select name="hostelAllotter" required>
-            <option value="">-- Select Hostel Allottee / Participant --</option>
-            <optgroup label="Ahmedabad Region">
-            <option>Shri Heraj Ram Chaudhary</option>
-            <option>Shri Dilip D. Chauhan</option>
-            <option>Shri Raval Vyomeshkumar</option>
-            <option>Shri Vinod Kumar Mahawar</option>
-            <option>Shri Shyam Bahadur Yadav</option>
-            </optgroup>
-            <optgroup label="Jaipur Region">
-            <option>Shri Kartar Singh Gurjar</option>
-            <option>Shri Vinay Singh Verma</option>
-            <option>Shri Baboo Singh Rathore</option>
-            <option>Shri Raghunath Ram</option>
-            <option>Shri Mool Singh Shekhawat</option>
-            <option>Shri Om Prakash Jangid</option>
-            <option>Shri Brijendra Kumar Tiwari</option>
-            <option>Shri Neka Ram Ghanchi</option>
-            <option>Shri Hemant Pandya</option>
-            <option>Shri Yogesh Kumar Meena</option>
-            <option>Shri Deepak Kumar Juneja</option>
-            <option>Shri Rajendra Kumar Meena</option>
-            <option>Shri Hukma Ram</option>
-            <option>Shri Rajesh Bagaria</option>
-            <option>Shri Pradeep Choudhary</option>
-            </optgroup>
-            <optgroup label="Mumbai Region">
-            <option>Shri Dinesh Kumar Tank</option>
-            <option>Shri Manoj Kumar Yadav</option>
-            <option>Shri Sunil Bapurao More</option>
-            <option>Shri Nilesh Onkarrao Ambadkar</option>
-            <option>Shri Anil Kumar</option>
-            <option>Shri Rajkumar Gadwal</option>
-            <option>Shri Pagare Amol Phillip</option>
-            <option>Shri Sham Bharat Nikum</option>
-            <option>Shri Amir Husain</option>
-            <option>Shri Gajraj Meena</option>
-            <option>Shri Ramphool Meena</option>
-            <option>Shri Gangadhar Govindrao Bhagat</option>
-            <option>Shri Ashok Kumar Singh</option>
-            <option>Shri Prahlad Verma</option>
-            <option>Balaji Namdeorao Marakwar</option>
-            <option>Shri Arun Kumar</option>
-            </optgroup>
-            <optgroup label="Patna Region">
-            <option>Shri Maheshwar Prasad Narain Singh</option>
-            <option>Shri Kumar Raghvendra</option>
-            <option>Shri Pawan Kumar Mahto</option>
-            <option>Shri Jitendra Kumar Pandey</option>
-            </optgroup>
-            <optgroup label="Raipur Region">
-            <option>Shri Ravi Shankar Yadav</option>
-            </optgroup>
-            <optgroup label="Mumbai Region">
-            <option>Shri Feroz Khan</option>
-            </optgroup>
-          </select>
-          <div class="note">The dropdown contains the printed participant names visible in the hostel-allotment lists you supplied, grouped by feeder region. Handwritten additions that were not fully legible have not been guessed.</div>
+          <input name="expectedArrival" type="datetime-local" required>
         </div>
         <div>
-          <label>🚪 Room No. (if already allotted)</label>
-          <input name="room" placeholder="Enter room number">
+          <label>⏱️ Actual Time of Arrival</label>
+          <input name="actualArrival" type="datetime-local">
         </div>
         <div>
           <label>✅ Whether Arrived *</label>
@@ -191,12 +192,14 @@ button.action{border:0;border-radius:11px;padding:13px 19px;font-size:15px;font-
       </div>
     </section>
 
+    
+
     <section id="facilitation" class="section pink">
       <h2>🤝 Arrival Facilitation</h2>
       <div class="grid">
         <div class="full">
-          <label>🙋 Facilitator Catering to the Arriving Participant *</label>
-          <select name="facilitator" required>
+          <label>🤝 Facilitation Ensured By *</label>
+          <select name="facilitationBy" required>
             <option value="">-- Select Facilitator --</option>
             <option>Mrs. Seema Mishra</option>
             <option>Mrs. Deepa Dilawari</option>
@@ -212,13 +215,13 @@ button.action{border:0;border-radius:11px;padding:13px 19px;font-size:15px;font-
         <div class="full">
           <label>🕐 Choose Time Slot for Participants' Arrival Facilitation *</label>
           <div class="slot-grid">
-            <label class="slot"><input type="radio" name="slot" value="10 - 12 AM" required>10 - 12 AM</label>
-            <label class="slot"><input type="radio" name="slot" value="12 Noon - 2 PM">12 Noon - 2 PM</label>
-            <label class="slot"><input type="radio" name="slot" value="2 - 4 PM">2 - 4 PM</label>
-            <label class="slot"><input type="radio" name="slot" value="4 - 6 PM">4 - 6 PM</label>
-            <label class="slot"><input type="radio" name="slot" value="6 - 8 PM">6 - 8 PM</label>
-            <label class="slot"><input type="radio" name="slot" value="8 - 10 PM">8 - 10 PM</label>
-            <label class="slot"><input type="radio" name="slot" value="10 PM - 12 Midnight">10 PM - 12 Midnight</label>
+            <label class="slot"><input type="radio" name="facilitationSlot" value="10 - 12 AM" required>10 - 12 AM</label>
+            <label class="slot"><input type="radio" name="facilitationSlot" value="12 Noon - 2 PM">12 Noon - 2 PM</label>
+            <label class="slot"><input type="radio" name="facilitationSlot" value="2 - 4 PM">2 - 4 PM</label>
+            <label class="slot"><input type="radio" name="facilitationSlot" value="4 - 6 PM">4 - 6 PM</label>
+            <label class="slot"><input type="radio" name="facilitationSlot" value="6 - 8 PM">6 - 8 PM</label>
+            <label class="slot"><input type="radio" name="facilitationSlot" value="8 - 10 PM">8 - 10 PM</label>
+            <label class="slot"><input type="radio" name="facilitationSlot" value="10 PM - 12 Midnight">10 PM - 12 Midnight</label>
           </div>
         </div>
         <div class="full">
@@ -245,7 +248,7 @@ button.action{border:0;border-radius:11px;padding:13px 19px;font-size:15px;font-
 </footer>
 
 <script>
-const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwiZzflne79iy599zTP-fqmZxlklTki51Ra22FcsTZZn4IoHAynr20uEuum44huypEZ/exec";
+const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwHmrshpCufjYaaGh_NRFy6wGZo3F44dw15pxoevGFzcMCHGlg7HZ5lJABA-xnw8eof/exec";
 
 function focusSection(id, btn) {
   document.getElementById(id).scrollIntoView({behavior:"smooth",block:"start"});
