@@ -716,7 +716,7 @@ button.action{border:0;border-radius:11px;padding:13px 19px;font-size:15px;font-
 </footer>
 
 <script>
-const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxHrgBGRgoxhiJiHAt_wFJ21_X4SIwV4yrctO1DRcUzvgAx0-RML-9h6B59RO7S7BJE/exec";
+const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw5xq8dvfMlaFE4Go6yIyFaCjRr2WMzyyS0bozW29LB3u9SNujZlfmbZAOCDrxIIwe4/exec";
 
 // Controlled facilitator list: keep every facilitator-name selector synchronized.
 const FACILITATORS = [
@@ -1136,14 +1136,39 @@ document.getElementById("form").addEventListener("submit", async function(e) {
   const form = this;
   const btn = document.getElementById("submitBtn");
   const status = document.getElementById("status");
-  const data = Object.fromEntries(new FormData(form).entries());
+  // Capture the actual canvas drawings immediately before submission.
+  const officialCanvas = document.getElementById("officialSignatureCanvas");
+  const facilitatorCanvas = document.getElementById("facilitatorSignatureCanvas");
+  const participantCanvas = document.getElementById("participantSignatureCanvas");
 
-  if (!data.facilitatorSignature || !data.participantSignature) {
+  document.getElementById("officialSignature").value =
+    officialCanvas.toDataURL("image/png");
+  document.getElementById("facilitatorSignature").value =
+    facilitatorCanvas.toDataURL("image/png");
+  document.getElementById("participantSignature").value =
+    participantCanvas.toDataURL("image/png");
+
+  // A blank canvas still produces a PNG data URL, so check the canvas pixels.
+  function canvasHasInk(canvas) {
+    const ctx = canvas.getContext("2d");
+    const w = canvas.width;
+    const h = canvas.height;
+    if (!w || !h) return false;
+    const pixels = ctx.getImageData(0, 0, w, h).data;
+    for (let i = 3; i < pixels.length; i += 4) {
+      if (pixels[i] > 0) return true;
+    }
+    return false;
+  }
+
+  if (!canvasHasInk(facilitatorCanvas) || !canvasHasInk(participantCanvas)) {
     status.className = "status err";
     status.style.display = "block";
     status.textContent = "✍️ Please provide both the Facilitator and Participant signatures.";
     return;
   }
+
+  const data = Object.fromEntries(new FormData(form).entries());
 
   btn.disabled = true;
   status.className = "status";
