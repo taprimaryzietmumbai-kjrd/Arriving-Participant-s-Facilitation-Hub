@@ -58,6 +58,17 @@ button.action{border:0;border-radius:11px;padding:13px 19px;font-size:15px;font-
 
 .family-row{margin-bottom:14px;padding:12px;border:1px solid var(--line);border-radius:12px;background:#ffffff88}
 </style>
+
+<style>
+.fixed-course-title{
+  font-weight:700;
+  padding:12px 14px;
+  margin:8px 0 14px;
+  border:1px solid #cbd5e1;
+  border-radius:10px;
+  background:#f8fafc;
+}
+</style>
 </head>
 <body>
 <header class="hero">
@@ -142,22 +153,107 @@ button.action{border:0;border-radius:11px;padding:13px 19px;font-size:15px;font-
         </div>
         <div>
           <label>🎓 Designation *</label>
-          <input name="designation" placeholder="Enter designation" required>
-        </div>
-        <div class="full">
-          <label>🏢 Office Address</label>
-          <textarea name="officeAddress" rows="2" placeholder="Enter office address"></textarea>
+          <select name="designation" required>
+            <option value="">-- Select Post / Designation --</option>
+            <option>Principal</option>
+            <option>Vice-Principal</option>
+            <option>Headmaster / Headmistress</option>
+            <option>Librarian</option>
+            <option>PGT (English)</option>
+            <option>PGT (Hindi)</option>
+            <option>PGT (Physics)</option>
+            <option>PGT (Chemistry)</option>
+            <option>PGT (Mathematics)</option>
+            <option>PGT (Economics)</option>
+            <option>PGT (History)</option>
+            <option>PGT (Geography)</option>
+            <option>PGT (Commerce)</option>
+            <option>PGT (Biology)</option>
+            <option>PGT (Bio-Technology)</option>
+            <option>TGT (Hindi)</option>
+            <option>TGT (English)</option>
+            <option>TGT (Sanskrit)</option>
+            <option>TGT (Social Studies)</option>
+            <option>TGT (Mathematics)</option>
+            <option>TGT (Science)</option>
+            <option>TGT (Physical & Health Edn.)</option>
+            <option>TGT (Art Education)</option>
+            <option>TGT (Work Experience)</option>
+            <option>Special Educator (TGT)</option>
+            <option>Special Educator (PRT)</option>
+            <option>PRT</option>
+            <option>PRT(Music)</option>
+            <option>Administrative Officer</option>
+            <option>Finance Officer</option>
+            <option>Assistant Engineer</option>
+            <option>Assistant Section Officer</option>
+            <option>Junior Translator</option>
+            <option>Sr. Secretariat Assistant</option>
+            <option>Jr. Secretariat Assistant</option>
+            <option>Steno Gr I</option>
+            <option>Steno Gr II</option>
+            <option>WET</option>
+            <option>AET</option>
+            <option>PRTM</option>
+            <option>JSA</option>
+            <option>SSA</option>
+            <option>SO</option>
+            <option>AO</option>
+          </select>
         </div>
         <div>
-          <label>🗺️ Region *</label>
-          <select name="region" required>
-            <option value="">-- Select Region --</option>
+          <label>🗺️ KVS Region *</label>
+          <select name="region" id="kvRegion" required>
+            <option value="">-- Select KVS Region First --</option>
+            <option>Agra</option>
             <option>Ahmedabad</option>
+            <option>Bengaluru</option>
+            <option>Bhopal</option>
+            <option>Bhubaneswar</option>
+            <option>Chandigarh</option>
+            <option>Chennai</option>
+            <option>Dehradun</option>
+            <option>Delhi</option>
+            <option>Ernakulam</option>
+            <option>Gurugram</option>
+            <option>Guwahati</option>
+            <option>Hyderabad</option>
+            <option>Jabalpur</option>
             <option>Jaipur</option>
+            <option>Jammu</option>
+            <option>Kolkata</option>
+            <option>Lucknow</option>
             <option>Mumbai</option>
             <option>Patna</option>
             <option>Raipur</option>
+            <option>Ranchi</option>
+            <option>Silchar</option>
+            <option>Tinsukia</option>
+            <option>Varanasi</option>
           </select>
+        </div>
+        <div>
+          <label>🏫 Name of Kendriya Vidyalaya / KV *</label>
+          <select name="kvName" id="kvName" required disabled>
+            <option value="">-- Select KVS Region First --</option>
+          </select>
+        </div>
+        <div>
+          <label>🗺️ State / UT *</label>
+          <select name="state" id="kvState" required disabled>
+            <option value="">-- Select State / UT --</option>
+          </select>
+          <small class="hint">State / UT is required and will be filled automatically after you select the KV.</small>
+        </div>
+        <div class="full">
+          <label>🏢 Office Address</label>
+          <select name="officeAddress" id="officeAddress">
+            <option value="">-- Office Address will appear here --</option>
+          </select>
+          
+        </div>
+        <div class="full" style="margin-top:-4px;">
+          
         </div>
         <div>
           <label>☎️ Phone No. (Office)</label>
@@ -184,16 +280,13 @@ button.action{border:0;border-radius:11px;padding:13px 19px;font-size:15px;font-
           </select>
         </div>
         <div>
-          <label>📚 Name of Training Programme *</label>
-          <input name="trainingProgramme" placeholder="Enter training programme name" required>
+          
         </div>
         <div>
-          <label>📅 Training Programme — From *</label>
-          <input name="trainingFrom" type="date" required>
+          
         </div>
         <div>
-          <label>📅 Training Programme — To *</label>
-          <input name="trainingTo" type="date" required>
+          
         </div>
         <div>
           <label>📅 Date of Arrival *</label>
@@ -398,7 +491,7 @@ button.action{border:0;border-radius:11px;padding:13px 19px;font-size:15px;font-
       <div class="grid">
         <div class="full">
           <label>🤝 Facilitation Ensured By *</label>
-          <select name="facilitationBy" required>
+          <select name="facilitationBy" class="facilitator-select" data-facilitator-select="true" required>
             <option value="">-- Select Facilitator --</option>
             <option>Mrs. Seema Mishra</option>
             <option>Mrs. Deepa Dilawari</option>
@@ -455,6 +548,19 @@ button.action{border:0;border-radius:11px;padding:13px 19px;font-size:15px;font-
       <p class="note">Both signatures can be drawn directly on the screen using a mouse, stylus or mobile touch screen.</p>
       <div class="signature-grid">
         <div class="signature-box">
+          <label>👤 Facilitator Name *</label>
+          <select name="facilitatorForSignature" id="facilitatorForSignature" class="facilitator-select" data-facilitator-select="true" required>
+            <option value="">-- Select Facilitator --</option>
+            <option value="Mrs. Seema Mishra">Mrs. Seema Mishra</option>
+            <option value="Mrs. Deepa Dilawari">Mrs. Deepa Dilawari</option>
+            <option value="Mrs. DEEPALI D KHADYE">Mrs. DEEPALI D KHADYE</option>
+            <option value="Mr. Shreyash Kamble">Mr. Shreyash Kamble</option>
+            <option value="Mr. Gajendra L. Kapde">Mr. Gajendra L. Kapde</option>
+            <option value="Mr. Nilesh Thangan">Mr. Nilesh Thangan</option>
+            <option value="Mr. Anand Kumar Srivastava">Mr. Anand Kumar Srivastava</option>
+            <option value="Dr. Rajesh Sharma">Dr. Rajesh Sharma</option>
+            <option value="Mrs. Joyce">Mrs. Joyce</option>
+          </select>
           <label>✍️ Signature of the Facilitator</label>
           <canvas id="facilitatorSignatureCanvas" class="signature-canvas"></canvas>
           <input type="hidden" name="facilitatorSignature" id="facilitatorSignature">
@@ -490,7 +596,32 @@ button.action{border:0;border-radius:11px;padding:13px 19px;font-size:15px;font-
 </footer>
 
 <script>
-const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxpk_kq5H3ETfcKvX--moBB4UlYjuivUuTfpTrKNpaQKvDD78EKxqxvwDRXIlM6bWIA/exec";
+const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwD75IeXRiw4INB4sAtgiBJlUUoCZBCMTNRutotAA29TtyTbNaj5Lff8Dz46w6pfmHI/exec";
+
+// Controlled facilitator list: keep every facilitator-name selector synchronized.
+const FACILITATORS = [
+  "Mrs. Seema Mishra",
+  "Mrs. Deepa Dilawari",
+  "Mrs. DEEPALI D KHADYE",
+  "Mr. Shreyash Kamble",
+  "Mr. Gajendra L. Kapde",
+  "Mr. Nilesh Thangan",
+  "Mr. Anand Kumar Srivastava",
+  "Dr. Rajesh Sharma",
+  "Mrs. Joyce"
+];
+
+function syncFacilitatorSelectors(source) {
+  document.querySelectorAll('[data-facilitator-select="true"]').forEach(function(sel) {
+    if (sel !== source) sel.value = source.value;
+  });
+}
+
+document.querySelectorAll('[data-facilitator-select="true"]').forEach(function(sel) {
+  sel.addEventListener("change", function() {
+    syncFacilitatorSelectors(this);
+  });
+});
 
 function focusSection(id, btn) {
   document.getElementById(id).scrollIntoView({behavior:"smooth",block:"start"});
@@ -593,6 +724,132 @@ function addFamilyMember() {
 setupSignature("officialSignatureCanvas", "officialSignature");
 setupSignature("facilitatorSignatureCanvas", "facilitatorSignature");
 setupSignature("participantSignatureCanvas", "participantSignature");
+
+
+/* KVS Region → KV → automatic State/UT + Office Address. */
+const KVS_DIRECTORY_URL = "https://kvsangathan.nic.in/en/directory-of-kvs/";
+const kvRegion = document.getElementById("kvRegion");
+const kvState = document.getElementById("kvState");
+const kvName = document.getElementById("kvName");
+const officeAddress = document.getElementById("officeAddress");
+
+function setOptions(select, values, placeholder) {
+  select.innerHTML = "";
+  const first = document.createElement("option");
+  first.value = "";
+  first.textContent = placeholder;
+  select.appendChild(first);
+  values.forEach(value => {
+    const opt = document.createElement("option");
+    opt.value = value.name || value;
+    opt.textContent = value.name || value;
+    if (value.address) opt.dataset.address = value.address;
+    if (value.state) opt.dataset.state = value.state;
+    if (value.code) opt.dataset.code = value.code;
+    select.appendChild(opt);
+  });
+}
+
+function resetKVFields() {
+  setOptions(kvName, [], "-- Select KVS Region first --");
+  kvName.disabled = true;
+  setOptions(kvState, [], "-- State / UT will be filled automatically --");
+  kvState.disabled = true;
+  setOptions(officeAddress, [], "-- Office Address will appear automatically --");
+}
+
+function loadKVForRegion(region) {
+  return new Promise((resolve, reject) => {
+    kvName.disabled = true;
+    setOptions(kvName, [], "-- Loading official KVs... --");
+    setOptions(kvState, [], "-- State / UT will be filled automatically --");
+    kvState.disabled = true;
+    setOptions(officeAddress, [], "-- Office Address will appear automatically --");
+
+    const callbackName = "kvsOfficialKVCallback_" + Date.now() + "_" + Math.floor(Math.random() * 100000);
+    const script = document.createElement("script");
+    const timer = setTimeout(() => {
+      cleanup();
+      reject(new Error("Official KVS directory request timed out."));
+    }, 45000);
+
+    function cleanup() {
+      clearTimeout(timer);
+      delete window[callbackName];
+      if (script.parentNode) script.parentNode.removeChild(script);
+    }
+
+    window[callbackName] = function(payload) {
+      cleanup();
+      if (!payload || payload.status !== "success" || !Array.isArray(payload.records)) {
+        reject(new Error("Official KVS directory returned no records."));
+        return;
+      }
+
+      const records = payload.records.slice().sort((a,b) =>
+        String(a.name || "").localeCompare(String(b.name || ""), undefined, {sensitivity:"base"})
+      );
+
+      setOptions(kvName, records, "-- Select Kendriya Vidyalaya --");
+      kvName.disabled = false;
+      resolve(records);
+    };
+
+    script.onerror = function() {
+      cleanup();
+      reject(new Error("Unable to connect to the official KVS directory service."));
+    };
+
+    script.src = GOOGLE_APPS_SCRIPT_URL
+      + "?action=kvList"
+      + "&region=" + encodeURIComponent(region)
+      + "&callback=" + encodeURIComponent(callbackName)
+      + "&_=" + Date.now();
+
+    document.body.appendChild(script);
+  });
+}
+
+kvRegion.addEventListener("change", function() {
+  const region = this.value;
+  if (!region) {
+    resetKVFields();
+    return;
+  }
+
+  // IMPORTANT: KV list appears immediately after Region selection.
+  // State/UT remains required, but is filled automatically AFTER KV selection.
+  loadKVForRegion(region).catch(err => {
+    kvName.disabled = false;
+    setOptions(kvName, [], "-- Official KVS list could not be loaded --");
+    console.error(err);
+  });
+});
+
+kvName.addEventListener("change", function() {
+  setOptions(officeAddress, [], "-- Office Address will appear automatically --");
+  setOptions(kvState, [], "-- State / UT will be filled automatically --");
+  kvState.disabled = true;
+
+  if (!this.value) return;
+
+  const selected = this.options[this.selectedIndex];
+  const address = selected?.dataset?.address || "";
+  const state = selected?.dataset?.state || "";
+
+  if (state) {
+    setOptions(kvState, [state], state);
+    kvState.value = state;
+    kvState.disabled = false;
+  }
+
+  if (address) {
+    setOptions(officeAddress, [{name: address, address: address}], address);
+    officeAddress.value = address;
+  }
+});
+
+resetKVFields();
 
 document.getElementById("form").addEventListener("submit", async function(e) {
   e.preventDefault();
