@@ -68,6 +68,18 @@ button.action{border:0;border-radius:11px;padding:13px 19px;font-size:15px;font-
   border-radius:10px;
   background:#f8fafc;
 }
+
+    /* Print / Save as PDF */
+    .document-actions { flex-wrap: wrap; }
+    .print-action, .pdf-action { background: #374151; color: #fff; }
+    @media print {
+      @page { size: A4; margin: 12mm; }
+      body { background: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .document-actions, button, .signature-actions, .status { display: none !important; }
+      input, select, textarea { color: #000 !important; background: #fff !important; }
+      .section { break-inside: avoid; }
+      .signature-canvas { border: 1px solid #777 !important; }
+    }
 </style>
 </head>
 <body>
@@ -702,7 +714,9 @@ button.action{border:0;border-radius:11px;padding:13px 19px;font-size:15px;font-
     <section class="section purple">
       <h2>🚀 Submit &amp; Central Record</h2>
       <p class="note">On submission, the entry is sent to the Google Sheet connected through your Google Apps Script Web App.</p>
-      <div class="actions">
+      <div class="actions document-actions" aria-label="Print and PDF options">
+        <button class="action print-action" type="button" onclick="printForm()">🖨️ Print</button>
+        <button class="action pdf-action" type="button" onclick="saveAsPDF()">📄 Save as PDF</button>
         <button class="action submit" id="submitBtn" type="submit">🚀 Submit Schedule to Google Sheet</button>
         <button class="action reset" type="reset">↻ Clear Form</button>
       </div>
@@ -1130,6 +1144,15 @@ updateHostelOccupancyLogic();
 calculateHostelPayment();
 
 document.getElementById("form").addEventListener("reset", function(){ setTimeout(calculateHostelPayment, 50); });
+
+function printForm() {
+  window.print();
+}
+
+function saveAsPDF() {
+  // Opens the browser print dialog; choose “Save as PDF” as the destination.
+  window.print();
+}
 
 document.getElementById("form").addEventListener("submit", async function(e) {
   e.preventDefault();
