@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Participants' Facilitator's Assistance Sheet | ZIET Mumbai</title>
+<style>
+*{box-sizing:border-box}
+:root{--blue:#1261a0;--deep:#073b66;--sky:#eaf6ff;--green:#18a957;--orange:#f59e0b;--pink:#e83e8c;--purple:#7c3aed;--ink:#18324a;--muted:#64748b;--line:#dbe7f0}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(135deg,#eef8ff,#fff8ef 45%,#f5efff);color:var(--ink)}
+.hero{padding:25px 18px 20px;text-align:center;color:#fff;background:linear-gradient(120deg,#063b69,#1273b9 55%,#0b9f88);box-shadow:0 5px 18px #0002}
+.hero .small{font-size:15px;font-weight:700;letter-spacing:.3px}
+.hero h1{margin:8px auto 5px;max-width:1000px;font-size:clamp(22px,4vw,36px)}
+.hero p{margin:4px auto;max-width:1050px;font-size:15px;line-height:1.45}
+.badge{display:inline-block;margin-top:10px;background:#fff;color:#0b4f80;padding:8px 14px;border-radius:30px;font-weight:800}
+.wrap{max-width:1050px;margin:22px auto;padding:0 14px}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+.tab{border:0;padding:13px 8px;border-radius:12px;background:#fff;box-shadow:0 3px 12px #0001;color:#31516d;font-weight:800;cursor:pointer}
+.tab.active{background:linear-gradient(135deg,#1477c9,#075293);color:#fff}
+.card{background:#fff;border:1px solid #e2edf5;border-radius:18px;box-shadow:0 8px 28px #16476b16;padding:22px;margin-bottom:16px}
+.section{border-radius:15px;padding:18px;margin-bottom:16px;border:1px solid}
+.blue{background:#eff8ff;border-color:#b9def7} .green{background:#effdf5;border-color:#bdebd0}
+.orange{background:#fff9ec;border-color:#f7dda1} .pink{background:#fff1f7;border-color:#f3bfd8}
+.purple{background:#f6f1ff;border-color:#d8c7ff}
+.section h2{margin:0 0 14px;font-size:20px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.full{grid-column:1/-1}
+label{display:block;font-weight:800;margin-bottom:7px}
+input,select,textarea{width:100%;padding:12px 13px;border:1px solid var(--line);border-radius:10px;background:#fff;font-size:15px;color:var(--ink)}
+input:focus,select:focus,textarea:focus{outline:3px solid #1477c933;border-color:#1477c9}
+.icon-label{display:flex;gap:8px;align-items:center}
+.icon{font-size:20px}
+.radio{display:flex;gap:18px;flex-wrap:wrap}
+.radio label{font-weight:600;display:flex;gap:7px;align-items:center}
+.radio input{width:auto}
+.slot-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.slot{border:2px solid #d8e5ee;background:#fff;border-radius:10px;padding:11px;text-align:center;font-weight:800;cursor:pointer}
+.slot input{display:none}
+.slot:has(input:checked){border-color:#1477c9;background:#eaf5ff;color:#075293}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+button.action{border:0;border-radius:11px;padding:13px 19px;font-size:15px;font-weight:800;cursor:pointer}
+.submit{background:linear-gradient(135deg,#0877dc,#075293);color:#fff}
+.reset{background:#eef2f6;color:#28455e}
+.status{display:none;margin-top:14px;padding:13px;border-radius:10px;font-weight:700}
+.status.ok{display:block;background:#e9f9ef;color:#13763b}
+.status.err{display:block;background:#fff0f0;color:#a02222}
+.note{font-size:13px;color:var(--muted);line-height:1.5}
+.footer{text-align:center;padding:18px;color:#587087;font-size:13px}
+@media(max-width:760px){.grid{grid-template-columns:1fr}.full{grid-column:auto}.tabs{grid-template-columns:1fr 1fr}.slot-grid{grid-template-columns:1fr 1fr}}
+
+.signature-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+.signature-box{background:#fff;border:2px dashed #b8c8d8;border-radius:14px;padding:12px}
+.signature-box label{display:block;font-weight:800;margin-bottom:8px}
+.signature-canvas{width:100%;height:180px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;touch-action:none;display:block}
+.signature-actions{display:flex;justify-content:flex-end;margin-top:8px}
+.clear-signature{border:0;border-radius:8px;padding:7px 12px;cursor:pointer;background:#eef2f7}
+@media(max-width:700px){.signature-grid{grid-template-columns:1fr}.signature-canvas{height:200px}}
+
+.family-row{margin-bottom:14px;padding:12px;border:1px solid var(--line);border-radius:12px;background:#ffffff88}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="small">केन्द्रीय विद्यालय संगठन, आंचलिक शिक्षा एवं प्रशिक्षण संस्थान, मुंबई</div>
+  <div class="small">KENDRIYA VIDYALAYA SANGATHAN (KVS) ZONAL INSTITUTE OF EDUCATION AND TRAINING (ZIET) MUMBAI</div>
+  <h1>Participants' Facilitator's Assistance Sheet</h1>
+  <p><strong>5 Day Face-to-Face Training Workshop on "Developing Leadership Competencies for Academic Excellence"</strong></p>
+  <p>For Vice-Principals • 07.09.2026 to 11.09.2026 • Ahmedabad, Jaipur, Mumbai, Patna &amp; Raipur</p>
+  <span class="badge">🌟 Together for a Smooth, Supportive &amp; Successful Training Experience</span>
+</header>
+
+<main class="wrap">
+  <div class="tabs">
+    <button class="tab active" onclick="focusSection('course',this)">📚 Course</button>
+    <button class="tab" onclick="focusSection('participant',this)">👤 Participant</button>
+    <button class="tab" onclick="focusSection('hostel',this)">🛏️ Hostel</button>
+    <button class="tab" onclick="focusSection('facilitation',this)">🤝 Facilitation</button>
+  <button class="tab blue" type="button" onclick="focusSection('application',this)">📋 Application</button></div>
+
+  <form id="form" class="card">
+    
+    <section id="application" class="section blue">
+      <h2>📋 Hostel Accommodation / Participant Details</h2>
+      <div class="grid">
+        <div>
+          <label>👤 Name *</label>
+          <input name="applicantName" placeholder="Enter full name" required>
+        </div>
+        <div>
+          <label>🎓 Designation *</label>
+          <input name="designation" placeholder="Enter designation" required>
+        </div>
+        <div class="full">
+          <label>🏢 Office Address</label>
+          <textarea name="officeAddress" rows="2" placeholder="Enter office address"></textarea>
+        </div>
+        <div>
+          <label>🗺️ Region *</label>
+          <select name="region" required>
+            <option value="">-- Select Region --</option>
+            <option>Ahmedabad</option>
+            <option>Jaipur</option>
+            <option>Mumbai</option>
+            <option>Patna</option>
+            <option>Raipur</option>
+          </select>
+        </div>
+        <div>
+          <label>☎️ Phone No. (Office)</label>
+          <input name="officePhone" type="tel" placeholder="Office telephone number">
+        </div>
+        <div>
+          <label>☎️ Residence No.</label>
+          <input name="residencePhone" type="tel" placeholder="Residence telephone number">
+        </div>
+        <div>
+          <label>📱 Mobile No. *</label>
+          <input name="mobile" type="tel" inputmode="numeric" placeholder="10-digit mobile number" pattern="[0-9]{10}" required>
+        </div>
+        <div class="full">
+          <label>✉️ E-mail</label>
+          <input name="email" type="email" placeholder="name@example.com">
+        </div>
+        <div>
+          <label>🎯 Purpose of Visit *</label>
+          <select name="purpose" required>
+            <option value="">-- Select Purpose --</option>
+            <option>OFFICIAL</option>
+            <option>PERSONAL</option>
+          </select>
+        </div>
+        <div>
+          <label>📚 Name of Training Programme *</label>
+          <input name="trainingProgramme" placeholder="Enter training programme name" required>
+        </div>
+        <div>
+          <label>📅 Training Programme — From *</label>
+          <input name="trainingFrom" type="date" required>
+        </div>
+        <div>
+          <label>📅 Training Programme — To *</label>
+          <input name="trainingTo" type="date" required>
+        </div>
+        <div>
+          <label>📅 Date of Arrival *</label>
+          <input name="arrivalDate" type="date" required>
+        </div>
+        <div>
+          <label>🕒 Time of Arrival *</label>
+          <input name="arrivalTime" type="time" required>
+        </div>
+        <div>
+          <label>📅 Expected Date of Departure *</label>
+          <input name="departureDate" type="date" required>
+        </div>
+        <div>
+          <label>🕒 Expected Time of Departure *</label>
+          <input name="departureTime" type="time" required>
+        </div>
+      </div>
+    </section>
+<section id="course" class="section blue">
+      <h2>📚 Course &amp; Coordinator Details</h2>
+      <div class="grid">
+        <div>
+          <label class="icon-label"><span class="icon">📖</span>Name of the Course *</label>
+          <input name="course" value="Developing Leadership Competencies for Academic Excellence" required>
+        </div>
+        <div>
+          <label class="icon-label"><span class="icon">🧑‍💼</span>Name of the Course Coordinator *</label>
+          <input name="coordinator" required>
+        </div>
+        <div class="full">
+          <label>📢 Was the participant's expected arrival time shared with all the members of Team ZIET? *</label>
+          <div class="radio">
+            <label><input type="radio" name="shared" value="Yes" required> ✅ Yes</label>
+            <label><input type="radio" name="shared" value="No"> ❌ No</label>
+            <label><input type="radio" name="shared" value="To be shared"> 🔔 To be shared</label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    
+    <section id="family" class="section orange">
+      <h2>👨‍👩‍👧 Family Member(s), If Any Staying With the Applicant</h2>
+      <p class="note">Add details only for family members staying with the applicant. This section is optional.</p>
+      <div id="familyRows">
+        <div class="family-row grid">
+          <div>
+            <label>Family Member Name</label>
+            <input name="familyName1" placeholder="Name">
+          </div>
+          <div>
+            <label>Sex</label>
+            <select name="familySex1">
+              <option value="">-- Select --</option>
+              <option>MALE</option>
+              <option>FEMALE</option>
+            </select>
+          </div>
+          <div>
+            <label>Relation</label>
+            <input name="familyRelation1" placeholder="Relation">
+          </div>
+          <div>
+            <label>Age</label>
+            <input name="familyAge1" type="number" min="0" max="120" placeholder="Age">
+          </div>
+          <div>
+            <label>Whether KVS Employee / Student</label>
+            <select name="familyKvsStatus1">
+              <option value="">-- Select --</option>
+              <option>KVS EMPLOYEE</option>
+              <option>KVS STUDENT</option>
+              <option>NO</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <button type="button" class="action reset" onclick="addFamilyMember()">＋ Add Family Member</button>
+    </section>
+<section id="participant" class="section green">
+      <h2>👤 Participant Arrival Details</h2>
+      <div class="grid">
+        <div class="full">
+          <label>👤 Name of the Hostel Allottee / Arriving Participant *</label>
+          <select name="participant" required>
+            <option value="">-- Select Participant --</option>
+            <optgroup label="Ahmedabad Region">
+              <option>Shri Heraj Ram Chaudhary</option>
+              <option>Shri Dilip D. Chauhan</option>
+              <option>Shri Raval Vyomeshkumar</option>
+              <option>Shri Vinod Kumar Mahawar</option>
+              <option>Shri Shyam Bahadur Yadav</option>
+            </optgroup>
+            <optgroup label="Jaipur Region">
+              <option>Shri Kartar Singh Gurjar</option>
+              <option>Shri Vinay Singh Verma</option>
+              <option>Shri Baboo Singh Rathore</option>
+              <option>Shri Raghunath Ram</option>
+              <option>Shri Mool Singh Shekhawat</option>
+              <option>Shri Om Prakash Jangid</option>
+              <option>Shri Brijendra Kumar Tiwari</option>
+              <option>Shri Neka Ram Ghanchi</option>
+              <option>Shri Hemant Pandya</option>
+              <option>Shri Yogesh Kumar Meena</option>
+              <option>Shri Deepak Kumar Juneja</option>
+              <option>Shri Rajendra Kumar Meena</option>
+              <option>Shri Hukma Ram</option>
+              <option>Shri Rajesh Bagaria</option>
+              <option>Shri Pradeep Choudhary</option>
+            </optgroup>
+            <optgroup label="Mumbai Region">
+              <option>Shri Dinesh Kumar Tank</option>
+              <option>Shri Manoj Kumar Yadav</option>
+              <option>Shri Sunil Bapurao More</option>
+              <option>Shri Nilesh Onkarrao Ambadkar</option>
+              <option>Shri Anil Kumar</option>
+              <option>Shri Rajkumar Gadwal</option>
+              <option>Shri Pagare Amol Phillip</option>
+              <option>Shri Sham Bharat Nikum</option>
+              <option>Shri Amir Husain</option>
+              <option>Shri Gajraj Meena</option>
+              <option>Shri Ramphool Meena</option>
+              <option>Shri Gangadhar Govindrao Bhagat</option>
+              <option>Shri Ashok Kumar Singh</option>
+              <option>Shri Prahlad Verma</option>
+              <option>Balaji Namdeorao Marakwar</option>
+              <option>Shri Arun Kumar</option>
+              <option>Shri Feroz Khan</option>
+            </optgroup>
+            <optgroup label="Patna Region">
+              <option>Shri Maheshwar Prasad Narain Singh</option>
+              <option>Shri Kumar Raghvendra</option>
+              <option>Shri Pawan Kumar Mahto</option>
+              <option>Shri Jitendra Kumar Pandey</option>
+            </optgroup>
+            <optgroup label="Raipur Region">
+              <option>Shri Ravi Shankar Yadav</option>
+            </optgroup>
+          </select>
+          <div class="note">Select the hostel allottee / arriving participant from the feeder-region list.</div>
+        </div>
+        <div>
+          <label>🏢 Block No. *</label>
+          <select name="block" required>
+            <option value="">-- Select Block --</option>
+            <option>A1</option>
+            <option>A2</option>
+            <option>A3</option>
+          </select>
+        </div>
+        <div>
+          <label>🚪 Room No. *</label>
+          <select name="room" required>
+            <option value="">-- Select Room No. --</option>
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
+            <option>5</option>
+            <option>6</option>
+            <option>7</option>
+            <option>8</option>
+            <option>9</option>
+            <option>10</option>
+            <option>11</option>
+            <option>12</option>
+            
+          </select>
+        </div>
+        <div>
+          <label>🕒 Expected Time of Arrival at ZIET Hostel *</label>
+          <input name="expectedArrival" type="datetime-local" required>
+        </div>
+        <div>
+          <label>⏱️ Actual Time of Arrival</label>
+          <input name="actualArrival" type="datetime-local">
+        </div>
+        <div>
+          <label>✅ Whether Arrived *</label>
+          <select name="arrived" required>
+            <option value="">-- Select --</option>
+            <option>YES</option>
+            <option>NO</option>
+          </select>
+        </div>
+        <div>
+          <label>🛏️ Checked In the Allotted Room? *</label>
+          <select name="checkedIn" required>
+            <option value="">-- Select --</option>
+            <option>YES</option>
+            <option>NO</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    
+
+    <section id="facilitation" class="section pink">
+      <h2>🤝 Arrival Facilitation</h2>
+      <div class="grid">
+        <div class="full">
+          <label>🤝 Facilitation Ensured By *</label>
+          <select name="facilitationBy" required>
+            <option value="">-- Select Facilitator --</option>
+            <option>Mrs. Seema Mishra</option>
+            <option>Mrs. Deepa Dilawari</option>
+            <option>Mrs. DEEPALI D KHADYE</option>
+            <option>Mr. Shreyash Kamble</option>
+            <option>Mr. Gajendra L. Kapde</option>
+            <option>Mr. Nilesh Thangan</option>
+            <option>Mr. Anand Kumar Srivastava</option>
+            <option>Dr. Rajesh Sharma</option>
+            <option>Mrs. Joyce</option>
+          </select>
+        </div>
+        <div class="full">
+          <label>🕐 Choose Time Slot for Participants' Arrival Facilitation *</label>
+          <div class="slot-grid">
+            <label class="slot"><input type="radio" name="facilitationSlot" value="10 - 12 AM" required>10 - 12 AM</label>
+            <label class="slot"><input type="radio" name="facilitationSlot" value="12 Noon - 2 PM">12 Noon - 2 PM</label>
+            <label class="slot"><input type="radio" name="facilitationSlot" value="2 - 4 PM">2 - 4 PM</label>
+            <label class="slot"><input type="radio" name="facilitationSlot" value="4 - 6 PM">4 - 6 PM</label>
+            <label class="slot"><input type="radio" name="facilitationSlot" value="6 - 8 PM">6 - 8 PM</label>
+            <label class="slot"><input type="radio" name="facilitationSlot" value="8 - 10 PM">8 - 10 PM</label>
+            <label class="slot"><input type="radio" name="facilitationSlot" value="10 PM - 12 Midnight">10 PM - 12 Midnight</label>
+          </div>
+        </div>
+        <div class="full">
+          <label>📝 Remarks / Special Assistance Required</label>
+          <textarea name="remarks" rows="3" placeholder="Any special arrival, hostel, luggage, accessibility or other assistance..."></textarea>
+        </div>
+      </div>
+    </section>
+
+
+    
+    <section class="section green">
+      <h2>🖊️ Official Verification</h2>
+      <div class="grid">
+        <div>
+          <label>👨‍💼 Name of Official</label>
+          <input name="officialName" placeholder="Name of verifying official">
+        </div>
+      </div>
+      <div class="signature-box" style="margin-top:14px">
+        <label>🖊️ Signature of Official</label>
+        <canvas id="officialSignatureCanvas" class="signature-canvas"></canvas>
+        <input type="hidden" name="officialSignature" id="officialSignature">
+        <div class="signature-actions">
+          <button type="button" class="clear-signature" onclick="clearSignature('official')">Clear Official Signature</button>
+        </div>
+      </div>
+    </section>
+
+<section class="section purple">
+      <h2>✍️ Final Signatures</h2>
+      <p class="note">Both signatures can be drawn directly on the screen using a mouse, stylus or mobile touch screen.</p>
+      <div class="signature-grid">
+        <div class="signature-box">
+          <label>✍️ Signature of the Facilitator</label>
+          <canvas id="facilitatorSignatureCanvas" class="signature-canvas"></canvas>
+          <input type="hidden" name="facilitatorSignature" id="facilitatorSignature">
+          <div class="signature-actions">
+            <button type="button" class="clear-signature" onclick="clearSignature('facilitator')">Clear Facilitator Signature</button>
+          </div>
+        </div>
+        <div class="signature-box">
+          <label>✍️ Signature of the Participant</label>
+          <canvas id="participantSignatureCanvas" class="signature-canvas"></canvas>
+          <input type="hidden" name="participantSignature" id="participantSignature">
+          <div class="signature-actions">
+            <button type="button" class="clear-signature" onclick="clearSignature('participant')">Clear Participant Signature</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section purple">
+      <h2>🚀 Submit &amp; Central Record</h2>
+      <p class="note">On submission, the entry is sent to the Google Sheet connected through your Google Apps Script Web App.</p>
+      <div class="actions">
+        <button class="action submit" id="submitBtn" type="submit">🚀 Submit Schedule to Google Sheet</button>
+        <button class="action reset" type="reset">↻ Clear Form</button>
+      </div>
+      <div id="status" class="status"></div>
+    </section>
+  </form>
+</main>
+
+<footer class="footer">
+  KVS ZIET Mumbai • Participant Arrival Facilitation • Learn • Connect • Collaborate • Grow
+</footer>
+
+<script>
+const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxpk_kq5H3ETfcKvX--moBB4UlYjuivUuTfpTrKNpaQKvDD78EKxqxvwDRXIlM6bWIA/exec";
+
+function focusSection(id, btn) {
+  document.getElementById(id).scrollIntoView({behavior:"smooth",block:"start"});
+  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+  btn.classList.add("active");
+}
+
+
+function setupSignature(canvasId, inputId) {
+  const canvas = document.getElementById(canvasId);
+  const input = document.getElementById(inputId);
+  const ctx = canvas.getContext("2d");
+
+  function resizeCanvas() {
+    const ratio = Math.max(window.devicePixelRatio || 1, 1);
+    const rect = canvas.getBoundingClientRect();
+    const old = canvas.width ? canvas.toDataURL() : null;
+    canvas.width = Math.round(rect.width * ratio);
+    canvas.height = Math.round(rect.height * ratio);
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    ctx.lineWidth = 2.2;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.strokeStyle = "#111827";
+    if (old) {
+      const img = new Image();
+      img.onload = () => ctx.drawImage(img, 0, 0, rect.width, rect.height);
+      img.src = old;
+    }
+  }
+
+  let drawing = false;
+  function point(ev) {
+    const rect = canvas.getBoundingClientRect();
+    const touch = ev.touches ? ev.touches[0] : ev;
+    return {x: touch.clientX - rect.left, y: touch.clientY - rect.top};
+  }
+  function start(ev) {
+    ev.preventDefault();
+    drawing = true;
+    const p = point(ev);
+    ctx.beginPath();
+    ctx.moveTo(p.x, p.y);
+  }
+  function move(ev) {
+    if (!drawing) return;
+    ev.preventDefault();
+    const p = point(ev);
+    ctx.lineTo(p.x, p.y);
+    ctx.stroke();
+  }
+  function end(ev) {
+    if (!drawing) return;
+    ev.preventDefault();
+    drawing = false;
+    input.value = canvas.toDataURL("image/png");
+  }
+
+  canvas.addEventListener("mousedown", start);
+  canvas.addEventListener("mousemove", move);
+  canvas.addEventListener("mouseup", end);
+  canvas.addEventListener("mouseleave", end);
+  canvas.addEventListener("touchstart", start, {passive:false});
+  canvas.addEventListener("touchmove", move, {passive:false});
+  canvas.addEventListener("touchend", end, {passive:false});
+  window.addEventListener("resize", resizeCanvas);
+  setTimeout(resizeCanvas, 50);
+}
+
+function clearSignature(which) {
+  const canvas = document.getElementById(
+    which === "facilitator" ? "facilitatorSignatureCanvas" :
+    which === "participant" ? "participantSignatureCanvas" : "officialSignatureCanvas"
+  );
+  const input = document.getElementById(
+    which === "facilitator" ? "facilitatorSignature" :
+    which === "participant" ? "participantSignature" : "officialSignature"
+  );
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  input.value = "";
+}
+
+
+let familyCount = 1;
+function addFamilyMember() {
+  familyCount++;
+  const row = document.createElement("div");
+  row.className = "family-row grid";
+  row.innerHTML = `
+    <div><label>Family Member Name</label><input name="familyName${familyCount}" placeholder="Name"></div>
+    <div><label>Sex</label><select name="familySex${familyCount}"><option value="">-- Select --</option><option>MALE</option><option>FEMALE</option></select></div>
+    <div><label>Relation</label><input name="familyRelation${familyCount}" placeholder="Relation"></div>
+    <div><label>Age</label><input name="familyAge${familyCount}" type="number" min="0" max="120" placeholder="Age"></div>
+    <div><label>Whether KVS Employee / Student</label><select name="familyKvsStatus${familyCount}"><option value="">-- Select --</option><option>KVS EMPLOYEE</option><option>KVS STUDENT</option><option>NO</option></select></div>
+  `;
+  document.getElementById("familyRows").appendChild(row);
+}
+
+setupSignature("officialSignatureCanvas", "officialSignature");
+setupSignature("facilitatorSignatureCanvas", "facilitatorSignature");
+setupSignature("participantSignatureCanvas", "participantSignature");
+
+document.getElementById("form").addEventListener("submit", async function(e) {
+  e.preventDefault();
+  const form = this;
+  const btn = document.getElementById("submitBtn");
+  const status = document.getElementById("status");
+  const data = Object.fromEntries(new FormData(form).entries());
+
+  if (!data.facilitatorSignature || !data.participantSignature) {
+    status.className = "status err";
+    status.style.display = "block";
+    status.textContent = "✍️ Please provide both the Facilitator and Participant signatures.";
+    return;
+  }
+
+  btn.disabled = true;
+  status.className = "status";
+  status.style.display = "block";
+  status.textContent = "⏳ Submitting your schedule...";
+
+  try {
+    await fetch(GOOGLE_APPS_SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: {"Content-Type":"text/plain;charset=utf-8"},
+      body: JSON.stringify(data)
+    });
+
+    status.className = "status ok";
+    status.textContent = "✅ Schedule submitted successfully to the Google Sheet.";
+    form.reset();
+    clearSignature("facilitator");
+    clearSignature("participant");
+  } catch (err) {
+    status.className = "status err";
+    status.textContent = "❌ Submission failed. Please try again.";
+  } finally {
+    btn.disabled = false;
+  }
+});
+</script>
+</body>
+</html>
