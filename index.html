@@ -1391,43 +1391,178 @@ window.addEventListener('DOMContentLoaded', function () {
     }) || null;
   }
 
-  function findKV(school, region) {
+ function findKV(school, region) {
 
-    if (!Array.isArray(KVS_DATA) || !school) {
-      return null;
-    }
-
-    const wantedSchool = cleanSchool(school);
-    const wantedRegion = clean(region);
-
-    // First: match school + region
-    let record = KVS_DATA.find(function (item) {
-      return clean(item.region) === wantedRegion &&
-             cleanSchool(item.name) === wantedSchool;
-    });
-
-    if (record) return record;
-
-    // Second: match school only
-    record = KVS_DATA.find(function (item) {
-      return cleanSchool(item.name) === wantedSchool;
-    });
-
-    if (record) return record;
-
-    // Third: partial school match
-    record = KVS_DATA.find(function (item) {
-
-      const itemSchool = cleanSchool(item.name);
-
-      return itemSchool &&
-        (itemSchool.includes(wantedSchool) ||
-         wantedSchool.includes(itemSchool));
-    });
-
-    return record || null;
+  if (!Array.isArray(KVS_DATA) || !school) {
+    return null;
   }
 
+  const wantedRegion = clean(region);
+
+  function normaliseSchool(value) {
+    let text = String(value || '').toUpperCase();
+
+    // Common numbering variations
+    text = text
+      .replace(/\bNO\s*0*1\b/g, ' NO1 ')
+      .replace(/\bNO\s*0*2\b/g, ' NO2 ')
+      .replace(/\bNO\s*0*3\b/g, ' NO3 ')
+      .replace(/\bNO\s*0*4\b/g, ' NO4 ')
+      .replace(/\bNO\s*0*5\b/g, ' NO5 ')
+      .replace(/\bNO\s*0*6\b/g, ' NO6 ')
+      .replace(/\bNO\s*0*7\b/g, ' NO7 ')
+      .replace(/\bNO\s*0*8\b/g, ' NO8 ')
+      .replace(/\bNO\s*0*9\b/g, ' NO9 ');
+
+    // Roman-number variations
+    text = text
+      .replace(/\bNO\s*I\b/g, ' NO1 ')
+      .replace(/\bNO\s*II\b/g, ' NO2 ')
+      .replace(/\bNO\s*III\b/g, ' NO3 ')
+      .replace(/\bNO\s*IV\b/g, ' NO4 ')
+      .replace(/\bNO\s*V\b/g, ' NO5 ');
+
+    // Remove generic KV terminology
+    text = text
+      .replace(/\bPM\s*SHRI\b/g, ' ')
+      .replace(/\bKENDRIYA\s*VIDYALAYA\b/g, ' ')
+      .replace(/\bKENDRIYA\b/g, ' ')
+      .replace(/\bVIDYALAYA\b/g, ' ')
+      .replace(/\bKV\b/g, ' ')
+      .replace(/\bNO\b/g, ' ');
+
+    return text
+      .replace(/[^A-Z0-9]+/g, ' ')
+      .trim()
+      .replace(/\s+/g, ' ');
+  }
+
+  function words(value) {
+    return normaliseSchool(value)
+      .split(' ')
+      .filter(function (word) {
+        return word.length >= 2;
+      });
+  }
+
+  const wantedWords = words(school);
+
+  if (!wantedWords.length) {
+    return null;
+  }
+
+  function similarity(a, b) {
+
+    if (a === b) return 1;
+
+    if (!a || !b) return 0;
+
+    if (a.includes(b) || b.includes(a)) {
+      return 0.9;
+    }
+
+    const matrix = [];
+
+    for (let i = 0; i <= a.length; i++) {
+      matrix[i] = [i];
+    }
+
+    for (let j = 0; j <= b.length; j++) {
+      matrix[0][j] = j;
+    }
+
+    for (let i = 1; i <= a.length; i++) {
+
+      for (let j = 1; j <= b.length; j++) {
+
+        const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j] + 1,
+          matrix[i][j - 1] + 1,
+          matrix[i - 1][j - 1] + cost
+        );
+      }
+    }
+
+    const distance = matrix[a.length][b.length];
+    const maxLength = Math.max(a.length, b.length);
+
+    return maxLength
+      ? 1 - distance / maxLength
+      : 0;
+  }
+
+  let bestRecord = null;
+  let bestScore = 0;
+
+  KVS_DATA.forEach(function (item) {
+
+    if (clean(item.region) !== wantedRegion) {
+      return;
+    }
+
+    // Use both school name and address.
+    // This helps cases such as:
+    // "KV RAJGARH, ALWAR"
+    // vs "KENDRIYA VIDYALAYA RAJGHRH"
+    const candidateText =
+      String(item.name || '') + ' ' +
+      String(item.address || '');
+
+    const candidateWords = words(candidateText);
+
+    let totalScore = 0;
+    let matchedWords = 0;
+
+    wantedWords.forEach(function (wantedWord) {
+
+      let highest = 0;
+
+      candidateWords.forEach(function (candidateWord) {
+
+        const score =
+          similarity(wantedWord, candidateWord);
+
+        if (score > highest) {
+          highest = score;
+        }
+      });
+
+      // Exact/near-exact word
+      if (highest >= 0.78) {
+        matchedWords++;
+        totalScore += highest;
+      }
+    });
+
+    if (!matchedWords) {
+      return;
+    }
+
+    const coverage =
+      matchedWords / wantedWords.length;
+
+    const average =
+      totalScore / matchedWords;
+
+    const finalScore =
+      (coverage * 0.65) +
+      (average * 0.35);
+
+    if (finalScore > bestScore) {
+      bestScore = finalScore;
+      bestRecord = item;
+    }
+  });
+
+  // Require a reasonably strong match.
+  if (bestRecord && bestScore >= 0.58) {
+    return bestRecord;
+  }
+
+  return null;
+}
   function autoFillParticipant(person) {
 
     if (!person) return;
