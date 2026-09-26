@@ -1246,7 +1246,7 @@ document.getElementById("form").addEventListener("submit", async function(e) {
 
     const label = document.createElement('label');
     label.htmlFor = 'liveParticipantSheet';
-    label.textContent = 'Participant List / Region';
+    label.textContent = 'Participant Sheet / Region';
     label.style.cssText = 'display:block;font-weight:600;margin-bottom:6px;';
 
     const select = document.createElement('select');
@@ -1287,31 +1287,22 @@ document.getElementById("form").addEventListener("submit", async function(e) {
     getParticipantSelects().forEach(function (select) {
       resetParticipantSelect(select);
 
-      const groups = {};
-      participants.forEach(function (person) {
-        const region = String(person.region || 'Other').trim() || 'Other';
-        if (!groups[region]) groups[region] = [];
-        groups[region].push(person);
-      });
-
-      Object.keys(groups).sort().forEach(function (region) {
-        const group = document.createElement('optgroup');
-        group.label = region;
-
-        groups[region].sort(function (a, b) {
-          return String(a.name || '').localeCompare(String(b.name || ''));
-        }).forEach(function (person) {
-          const option = document.createElement('option');
-          option.value = String(person.name || person.hindiName || '').trim();
-          option.textContent = String(person.name || person.hindiName || '').trim();
-          if (person.designation) option.textContent += ' — ' + person.designation;
-          if (person.school) option.textContent += ' — ' + person.school;
-          option.dataset.sourceSheet = person.sourceSheet || '';
-          option.dataset.sourceRow = person.sourceRow || '';
-          group.appendChild(option);
-        });
-
-        select.appendChild(group);
+      // The selected Google Sheet tab is the participant list.
+      // Do NOT regroup these participants by their Region field here.
+      // A sheet may contain participants from more than one region.
+      participants.sort(function (a, b) {
+        return String(a.name || a.hindiName || '').localeCompare(
+          String(b.name || b.hindiName || '')
+        );
+      }).forEach(function (person) {
+        const option = document.createElement('option');
+        option.value = String(person.name || person.hindiName || '').trim();
+        option.textContent = String(person.name || person.hindiName || '').trim();
+        if (person.designation) option.textContent += ' — ' + person.designation;
+        if (person.school) option.textContent += ' — ' + person.school;
+        option.dataset.sourceSheet = person.sourceSheet || '';
+        option.dataset.sourceRow = person.sourceRow || '';
+        select.appendChild(option);
       });
     });
 
