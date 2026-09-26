@@ -1218,6 +1218,118 @@ document.getElementById("form").addEventListener("submit", async function(e) {
     btn.disabled = false;
   }
 });
-</script>
+// ===== LIVE PARTICIPANT LIST FROM GOOGLE SHEET =====
+
+window.addEventListener('DOMContentLoaded', function () {
+
+  const API_URL =
+    'https://script.google.com/macros/s/AKfycbxOxaBDPB8jzEgZDevEQbCdH0sNnMshtq7GhNWrvUc38-HfWWs12VXVC8UrOin-B6rLRg/exec?action=participants';
+
+  const participantSelects = document.querySelectorAll(
+    'select[name="applicantName"], select[name="participant"]'
+  );
+
+  if (!participantSelects.length) return;
+
+  fetch(API_URL)
+    .then(function (response) {
+      return response.json();
+    })
+    .then(function (data) {
+
+      if (!data.success || !Array.isArray(data.participants)) {
+        throw new Error('Participant data could not be loaded.');
+      }
+
+      const participants = data.participants;
+
+      participantSelects.forEach(function (select) {
+
+        const firstOption = select.options[0];
+
+        select.innerHTML = '';
+
+        if (firstOption) {
+          select.appendChild(firstOption);
+        }
+
+        const groups = {};
+
+        participants.forEach(function (person) {
+
+          const region =
+            person.region ||
+            person.regionHindi ||
+            'Other';
+
+          if (!groups[region]) {
+            groups[region] = [];
+          }
+
+          groups[region].push(person);
+        });
+
+        Object.keys(groups)
+          .sort()
+          .forEach(function (region) {
+
+            const optgroup =
+              document.createElement('optgroup');
+
+            optgroup.label = region;
+
+            groups[region]
+              .sort(function (a, b) {
+                return (a.name || '').localeCompare(
+                  b.name || ''
+                );
+              })
+              .forEach(function (person) {
+
+                const option =
+                  document.createElement('option');
+
+                option.value =
+                  person.name || person.nameHindi || '';
+
+                option.textContent =
+                  person.name ||
+                  person.nameHindi ||
+                  '';
+
+                if (person.designation) {
+                  option.textContent +=
+                    ' — ' + person.designation;
+                }
+
+                if (person.school) {
+                  option.textContent +=
+                    ' — ' + person.school;
+                }
+
+                optgroup.appendChild(option);
+              });
+
+            select.appendChild(optgroup);
+          });
+
+      });
+
+      console.log(
+        'Live participants loaded:',
+        participants.length
+      );
+
+    })
+    .catch(function (error) {
+
+      console.error(
+        'Could not load live participant list:',
+        error
+      );
+
+    });
+
+});</script>
 </body>
 </html>
