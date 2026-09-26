@@ -1332,163 +1332,342 @@ window.addEventListener('DOMContentLoaded', function () {
 
 });
   // ===== AUTO-FILL PARTICIPANT DETAILS =====
+// ===== AUTO-FILL PARTICIPANT DETAILS =====
 
 (function () {
 
   const API_URL =
     'https://script.google.com/macros/s/AKfycbxOxaBDPB8jzEgZDevEQbCdH0sNnMshtq7GhNWrvUc38-HfWWs12VXVC8UrOin-B6rLRg/exec?action=participants';
 
+  function clean(value) {
+    return String(value || '')
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, '');
+  }
+
+  function cleanSchool(value) {
+    return clean(value)
+      .replace(/^pmshri/, '')
+      .replace(/^kendriyavidyalaya/, '')
+      .replace(/^kv/, '');
+  }
+
+  function findParticipant(participants, selectedName) {
+
+    const wanted = clean(selectedName);
+
+    return participants.find(function (person) {
+
+      return (
+        clean(person.name) === wanted ||
+        clean(person.nameHindi) === wanted
+      );
+
+    });
+
+  }
+
+  function findDesignation(value) {
+
+    const select =
+      document.querySelector(
+        'select[name="designation"]'
+      );
+
+    if (!select || !value) return null;
+
+    const wanted = clean(value);
+
+    return Array.from(select.options).find(function (option) {
+
+      return (
+        clean(option.value) === wanted ||
+        clean(option.textContent) === wanted
+      );
+
+    });
+
+  }
+
+  function findRegion(value) {
+
+    const select =
+      document.getElementById('kvRegion');
+
+    if (!select || !value) return null;
+
+    const wanted = clean(value);
+
+    return Array.from(select.options).find(function (option) {
+
+      return (
+        clean(option.value) === wanted ||
+        clean(option.textContent) === wanted
+      );
+
+    });
+
+  }
+
+  function findKV(school, region) {
+
+    if (
+      typeof KVS_DATA === 'undefined' ||
+      !Array.isArray(KVS_DATA)
+    ) {
+      return null;
+    }
+
+    const wantedSchool =
+      cleanSchool(school);
+
+    const wantedRegion =
+      clean(region);
+
+    // First: school + region
+    let record = KVS_DATA.find(function (kv) {
+
+      return (
+        cleanSchool(kv.name) === wantedSchool &&
+        clean(kv.region) === wantedRegion
+      );
+
+    });
+
+    if (record) return record;
+
+    // Second: school only
+    record = KVS_DATA.find(function (kv) {
+
+      return cleanSchool(kv.name) === wantedSchool;
+
+    });
+
+    if (record) return record;
+
+    // Third: partial school match
+    return KVS_DATA.find(function (kv) {
+
+      const kvSchool =
+        cleanSchool(kv.name);
+
+      return (
+        kvSchool &&
+        wantedSchool &&
+        (
+          kvSchool.includes(wantedSchool) ||
+          wantedSchool.includes(kvSchool)
+        )
+      );
+
+    }) || null;
+
+  }
+
+  function autoFillParticipant(person) {
+
+    if (!person) return;
+
+    // ==========================================
+    // 1. DESIGNATION
+    // ==========================================
+
+    const designation =
+      document.querySelector(
+        'select[name="designation"]'
+      );
+
+    const designationOption =
+      findDesignation(person.designation);
+
+    if (
+      designation &&
+      designationOption
+    ) {
+
+      designation.value =
+        designationOption.value;
+
+      designation.dispatchEvent(
+        new Event('change', {
+          bubbles: true
+        })
+      );
+
+    }
+
+    // ==========================================
+    // 2. KVS REGION
+    // ==========================================
+
+    const region =
+      document.getElementById('kvRegion');
+
+    const regionOption =
+      findRegion(person.region);
+
+    if (
+      region &&
+      regionOption
+    ) {
+
+      region.value =
+        regionOption.value;
+
+      // This existing function loads the
+      // correct KV list for that region.
+      loadKVForRegion(region.value);
+
+    }
+
+    // ==========================================
+    // 3. KENDRIYA VIDYALAYA
+    // ==========================================
+
+    const kvRecord =
+      findKV(
+        person.school,
+        person.region
+      );
+
+    const kv =
+      document.getElementById('kvName');
+
+    if (
+      kv &&
+      kvRecord
+    ) {
+
+      kv.value =
+        kvRecord.code;
+
+      // This existing function fills:
+      // State / UT
+      // Office Address
+      // Principal Name
+      // Principal Email
+      // Principal Phone
+      // KV Website
+      fillKVDetails();
+
+    }
+
+    console.log(
+      'Participant details auto-filled:',
+      {
+        name: person.name,
+        designation: person.designation,
+        region: person.region,
+        school: person.school,
+        matchedKV: kvRecord
+          ? kvRecord.name
+          : 'NOT FOUND'
+      }
+    );
+
+  }
+
+  function attachParticipantListeners(
+    participants
+  ) {
+
+    const participantSelects =
+      document.querySelectorAll(
+        'select[name="applicantName"], select[name="participant"]'
+      );
+
+    participantSelects.forEach(function (select) {
+
+      if (
+        select.dataset.participantAutoFill ===
+        'true'
+      ) {
+        return;
+      }
+
+      select.dataset.participantAutoFill =
+        'true';
+
+      select.addEventListener(
+        'change',
+        function () {
+
+          const selectedName =
+            select.value;
+
+          if (!selectedName) return;
+
+          const person =
+            findParticipant(
+              participants,
+              selectedName
+            );
+
+          if (!person) {
+
+            console.warn(
+              'Participant not found:',
+              selectedName
+            );
+
+            return;
+          }
+
+          autoFillParticipant(person);
+
+        }
+      );
+
+    });
+
+  }
+
+  // ==========================================
+  // GET LIVE PARTICIPANT DATA
+  // ==========================================
+
   fetch(API_URL)
+
     .then(function (response) {
+
+      if (!response.ok) {
+
+        throw new Error(
+          'API error: ' +
+          response.status
+        );
+
+      }
+
       return response.json();
+
     })
+
     .then(function (data) {
 
       if (
         !data.success ||
         !Array.isArray(data.participants)
       ) {
-        return;
+
+        throw new Error(
+          'Invalid participant data'
+        );
+
       }
 
-      const participants = data.participants;
+      attachParticipantListeners(
+        data.participants
+      );
 
-      const participantSelects =
-        document.querySelectorAll(
-          'select[name="applicantName"], select[name="participant"]'
-        );
-
-      participantSelects.forEach(function (participantSelect) {
-
-        participantSelect.addEventListener(
-          'change',
-          function () {
-
-            const selectedName =
-              participantSelect.value.trim();
-
-            if (!selectedName) return;
-
-            const person =
-              participants.find(function (p) {
-                return String(p.name || '').trim() === selectedName;
-              }) ||
-              participants.find(function (p) {
-                return String(p.nameHindi || '').trim() === selectedName;
-              });
-
-            if (!person) return;
-
-
-            // DESIGNATION
-            const designation =
-              document.querySelector(
-                'select[name="designation"]'
-              );
-
-            if (designation && person.designation) {
-
-              const option =
-                Array.from(designation.options).find(
-                  function (opt) {
-                    return (
-                      opt.value.trim() ===
-                      person.designation.trim()
-                    ) ||
-                    opt.textContent.trim() ===
-                    person.designation.trim();
-                  }
-                );
-
-              if (option) {
-
-                designation.value =
-                  option.value;
-
-                designation.dispatchEvent(
-                  new Event('change', {
-                    bubbles: true
-                  })
-                );
-              }
-            }
-
-
-            // KVS REGION
-            const region =
-              document.getElementById('kvRegion');
-
-            if (region && person.region) {
-
-              const option =
-                Array.from(region.options).find(
-                  function (opt) {
-                    return (
-                      opt.value.trim().toLowerCase() ===
-                      person.region.trim().toLowerCase()
-                    ) ||
-                    opt.textContent.trim().toLowerCase() ===
-                    person.region.trim().toLowerCase();
-                  }
-                );
-
-              if (option) {
-
-                region.value =
-                  option.value;
-
-                region.dispatchEvent(
-                  new Event('change', {
-                    bubbles: true
-                  })
-                );
-              }
-            }
-
-
-            // KENDRIYA VIDYALAYA
-            const kv =
-              document.getElementById('kvName');
-
-            if (kv && person.school) {
-
-              const option =
-                Array.from(kv.options).find(
-                  function (opt) {
-                    return (
-                      opt.value.trim().toLowerCase() ===
-                      person.school.trim().toLowerCase()
-                    ) ||
-                    opt.textContent.trim().toLowerCase() ===
-                    person.school.trim().toLowerCase();
-                  }
-                );
-
-              if (option) {
-
-                kv.value =
-                  option.value;
-
-                kv.dispatchEvent(
-                  new Event('change', {
-                    bubbles: true
-                  })
-                );
-              }
-            }
-
-
-            console.log(
-              'Participant details auto-filled:',
-              person.name
-            );
-
-          }
-        );
-
-      });
+      console.log(
+        'Participant auto-fill ready:',
+        data.participants.length
+      );
 
     })
+
     .catch(function (error) {
 
       console.error(
@@ -1498,7 +1677,6 @@ window.addEventListener('DOMContentLoaded', function () {
 
     });
 
-})();
-</script>
+})();</script>
 </body>
 </html>
