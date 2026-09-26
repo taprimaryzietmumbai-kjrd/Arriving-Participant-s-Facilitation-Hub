@@ -1,3 +1,4 @@
+```
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1218,125 +1219,27 @@ document.getElementById("form").addEventListener("submit", async function(e) {
     btn.disabled = false;
   }
 });
-// ===== LIVE PARTICIPANT LIST FROM GOOGLE SHEET =====
-
-window.addEventListener('DOMContentLoaded', function () {
-
-  const API_URL =
-    'https://script.google.com/macros/s/AKfycbxOxaBDPB8jzEgZDevEQbCdH0sNnMshtq7GhNWrvUc38-HfWWs12VXVC8UrOin-B6rLRg/exec?action=participants';
-
-  const participantSelects = document.querySelectorAll(
-    'select[name="applicantName"], select[name="participant"]'
-  );
-
-  if (!participantSelects.length) return;
-
-  fetch(API_URL)
-    .then(function (response) {
-      return response.json();
-    })
-    .then(function (data) {
-
-      if (!data.success || !Array.isArray(data.participants)) {
-        throw new Error('Participant data could not be loaded.');
-      }
-
-      const participants = data.participants;
-
-      participantSelects.forEach(function (select) {
-
-        const firstOption = select.options[0];
-
-        select.innerHTML = '';
-
-        if (firstOption) {
-          select.appendChild(firstOption);
-        }
-
-        const groups = {};
-
-        participants.forEach(function (person) {
-
-          const region =
-            person.region ||
-            person.regionHindi ||
-            'Other';
-
-          if (!groups[region]) {
-            groups[region] = [];
-          }
-
-          groups[region].push(person);
-        });
-
-        Object.keys(groups)
-          .sort()
-          .forEach(function (region) {
-
-            const optgroup =
-              document.createElement('optgroup');
-
-            optgroup.label = region;
-
-            groups[region]
-              .sort(function (a, b) {
-                return (a.name || '').localeCompare(
-                  b.name || ''
-                );
-              })
-              .forEach(function (person) {
-
-                const option =
-                  document.createElement('option');
-
-                option.value =
-                  person.name || person.nameHindi || '';
-
-                option.textContent =
-                  person.name ||
-                  person.nameHindi ||
-                  '';
-
-                if (person.designation) {
-                  option.textContent +=
-                    ' — ' + person.designation;
-                }
-
-                if (person.school) {
-                  option.textContent +=
-                    ' — ' + person.school;
-                }
-
-                optgroup.appendChild(option);
-              });
-
-            select.appendChild(optgroup);
-          });
-
-      });
-
-      console.log(
-        'Live participants loaded:',
-        participants.length
-      );
-
-    })
-    .catch(function (error) {
-
-      console.error(
-        'Could not load live participant list:',
-        error
-      );
-
-    });
-
-});
-// ===== AUTO-FILL PARTICIPANT DETAILS =====
+// ===== LIVE PARTICIPANT TAB + AUTO-FILL =====
 
 (function () {
 
-  const API_URL =
-    'https://script.google.com/macros/s/AKfycbxOxaBDPB8jzEgZDevEQbCdH0sNnMshtq7GhNWrvUc38-HfWWs12VXVC8UrOin-B6rLRg/exec?action=participants';
+  const PARTICIPANT_API_URL =
+    'https://script.google.com/macros/s/AKfycbxOxaBDPB8jzEgZDevEQbCdH0sNnMshtq7GhNWrvUc38-HfWWs12VXVC8UrOin-B6rLRg/exec';
+
+  const applicantSelect =
+    document.querySelector('select[name="applicantName"]');
+
+  const participantSelect =
+    document.querySelector('select[name="participant"]');
+
+  if (!applicantSelect && !participantSelect) {
+    console.error('Participant dropdowns were not found.');
+    return;
+  }
+
+  /* =======================================================
+     TEXT HELPERS
+  ======================================================= */
 
   function clean(value) {
     return String(value || '')
@@ -1345,30 +1248,74 @@ window.addEventListener('DOMContentLoaded', function () {
       .replace(/[^A-Z0-9]+/g, '');
   }
 
-  function cleanSchool(value) {
-    return clean(value)
-      .replace(/^PMSHRI/, '')
-      .replace(/^KENDRIYAVIDYALAYA/, '')
-      .replace(/^KV/, '');
+  function normaliseSchool(value) {
+    let text = String(value || '').toUpperCase();
+
+    /* Known harmless spelling variants seen in participant data. */
+    text = text
+      .replace(/\bGAYAJEE\b/g, 'GAYA')
+      .replace(/\bRAJGHRH\b/g, 'RAJGARH');
+
+    /* Arabic numbering. */
+    text = text
+      .replace(/\bNO\s*0*1\b/g, ' NO1 ')
+      .replace(/\bNO\s*0*2\b/g, ' NO2 ')
+      .replace(/\bNO\s*0*3\b/g, ' NO3 ')
+      .replace(/\bNO\s*0*4\b/g, ' NO4 ')
+      .replace(/\bNO\s*0*5\b/g, ' NO5 ')
+      .replace(/\bNO\s*0*6\b/g, ' NO6 ')
+      .replace(/\bNO\s*0*7\b/g, ' NO7 ')
+      .replace(/\bNO\s*0*8\b/g, ' NO8 ')
+      .replace(/\bNO\s*0*9\b/g, ' NO9 ');
+
+    /* Roman numbering. */
+    text = text
+      .replace(/\bNO\s*I\b/g, ' NO1 ')
+      .replace(/\bNO\s*II\b/g, ' NO2 ')
+      .replace(/\bNO\s*III\b/g, ' NO3 ')
+      .replace(/\bNO\s*IV\b/g, ' NO4 ')
+      .replace(/\bNO\s*V\b/g, ' NO5 ')
+      .replace(/\bNO\s*VI\b/g, ' NO6 ')
+      .replace(/\bNO\s*VII\b/g, ' NO7 ')
+      .replace(/\bNO\s*VIII\b/g, ' NO8 ')
+      .replace(/\bNO\s*IX\b/g, ' NO9 ');
+
+    /* Remove generic school wording. */
+    text = text
+      .replace(/\bPM\s*SHRI\b/g, ' ')
+      .replace(/\bKENDRIYA\s*VIDYALAYA\b/g, ' ')
+      .replace(/\bKENDRIYA\b/g, ' ')
+      .replace(/\bVIDYALAYA\b/g, ' ')
+      .replace(/\bKV\b/g, ' ')
+      .replace(/\bNO\b/g, ' ')
+      .replace(/\bPMSHRI\b/g, ' ')
+      .replace(/\bFS\b/g, ' ')
+      .replace(/\bSS\b/g, ' ');
+
+    return text
+      .replace(/[^A-Z0-9]+/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
   }
 
-  function findOption(select, value) {
-    if (!select || !value) return null;
-
-    const wanted = clean(value);
-
-    return Array.from(select.options).find(function (option) {
-      return clean(option.value) === wanted ||
-             clean(option.textContent) === wanted;
-    }) || null;
+  function schoolWords(value) {
+    return normaliseSchool(value)
+      .split(' ')
+      .filter(function (word) {
+        return word.length >= 2;
+      });
   }
+
+  /* =======================================================
+     DESIGNATION / REGION MATCHING
+  ======================================================= */
 
   function findDesignation(value) {
     const select = document.querySelector(
       'select[name="designation"]'
     );
 
-    if (!select) return null;
+    if (!select || !value) return null;
 
     const wanted = clean(value);
 
@@ -1381,7 +1328,7 @@ window.addEventListener('DOMContentLoaded', function () {
   function findRegion(value) {
     const select = document.getElementById('kvRegion');
 
-    if (!select) return null;
+    if (!select || !value) return null;
 
     const wanted = clean(value);
 
@@ -1391,190 +1338,109 @@ window.addEventListener('DOMContentLoaded', function () {
     }) || null;
   }
 
- function findKV(school, region) {
+  /* =======================================================
+     SAFE KV MATCHER
 
-  if (!Array.isArray(KVS_DATA) || !school) {
-    return null;
-  }
+     No broad fuzzy guessing.
+     If a match cannot be established safely, return null.
+  ======================================================= */
 
-  const wantedRegion = clean(region);
+  function findKV(school, region) {
 
-  function normaliseSchool(value) {
-    let text = String(value || '').toUpperCase();
-
-    // Common numbering variations
-    text = text
-      .replace(/\bNO\s*0*1\b/g, ' NO1 ')
-      .replace(/\bNO\s*0*2\b/g, ' NO2 ')
-      .replace(/\bNO\s*0*3\b/g, ' NO3 ')
-      .replace(/\bNO\s*0*4\b/g, ' NO4 ')
-      .replace(/\bNO\s*0*5\b/g, ' NO5 ')
-      .replace(/\bNO\s*0*6\b/g, ' NO6 ')
-      .replace(/\bNO\s*0*7\b/g, ' NO7 ')
-      .replace(/\bNO\s*0*8\b/g, ' NO8 ')
-      .replace(/\bNO\s*0*9\b/g, ' NO9 ');
-
-    // Roman-number variations
-    text = text
-      .replace(/\bNO\s*I\b/g, ' NO1 ')
-      .replace(/\bNO\s*II\b/g, ' NO2 ')
-      .replace(/\bNO\s*III\b/g, ' NO3 ')
-      .replace(/\bNO\s*IV\b/g, ' NO4 ')
-      .replace(/\bNO\s*V\b/g, ' NO5 ');
-
-    // Remove generic KV terminology
-    text = text
-      .replace(/\bPM\s*SHRI\b/g, ' ')
-      .replace(/\bKENDRIYA\s*VIDYALAYA\b/g, ' ')
-      .replace(/\bKENDRIYA\b/g, ' ')
-      .replace(/\bVIDYALAYA\b/g, ' ')
-      .replace(/\bKV\b/g, ' ')
-      .replace(/\bNO\b/g, ' ');
-
-    return text
-      .replace(/[^A-Z0-9]+/g, ' ')
-      .trim()
-      .replace(/\s+/g, ' ');
-  }
-
-  function words(value) {
-    return normaliseSchool(value)
-      .split(' ')
-      .filter(function (word) {
-        return word.length >= 2;
-      });
-  }
-
-  const wantedWords = words(school);
-
-  if (!wantedWords.length) {
-    return null;
-  }
-
-  function similarity(a, b) {
-
-    if (a === b) return 1;
-
-    if (!a || !b) return 0;
-
-    if (a.includes(b) || b.includes(a)) {
-      return 0.9;
+    if (!Array.isArray(KVS_DATA) || !school) {
+      return null;
     }
 
-    const matrix = [];
+    const wantedWords = schoolWords(school);
+    if (!wantedWords.length) return null;
 
-    for (let i = 0; i <= a.length; i++) {
-      matrix[i] = [i];
-    }
+    const wantedNormal = normaliseSchool(school);
+    const numberMatch = wantedNormal.match(/\bNO(\d+)\b/);
+    const wantedNumber = numberMatch ? numberMatch[1] : '';
+    const wantedRegion = clean(region);
 
-    for (let j = 0; j <= b.length; j++) {
-      matrix[0][j] = j;
-    }
+    const candidates = [];
 
-    for (let i = 1; i <= a.length; i++) {
+    KVS_DATA.forEach(function (item) {
 
-      for (let j = 1; j <= b.length; j++) {
+      if (!item) return;
 
-        const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      const candidateName = String(item.name || '');
+      const candidateAddress = String(item.address || '');
+      const candidateNormal = normaliseSchool(
+        candidateName + ' ' + candidateAddress
+      );
 
-        matrix[i][j] = Math.min(
-          matrix[i - 1][j] + 1,
-          matrix[i][j - 1] + 1,
-          matrix[i - 1][j - 1] + cost
-        );
+      /* If participant has a school number, it must agree. */
+      if (wantedNumber) {
+        const candidateNumberMatch =
+          candidateNormal.match(/\bNO(\d+)\b/);
+
+        const candidateNumber =
+          candidateNumberMatch ? candidateNumberMatch[1] : '';
+
+        if (candidateNumber !== wantedNumber) return;
       }
-    }
 
-    const distance = matrix[a.length][b.length];
-    const maxLength = Math.max(a.length, b.length);
+      const candidateWords = candidateNormal
+        .split(' ')
+        .filter(function (word) {
+          return word.length >= 2;
+        });
 
-    return maxLength
-      ? 1 - distance / maxLength
-      : 0;
-  }
-
-  let bestRecord = null;
-  let bestScore = 0;
-
-  KVS_DATA.forEach(function (item) {
-
-    if (clean(item.region) !== wantedRegion) {
-      return;
-    }
-
-    // Use both school name and address.
-    // This helps cases such as:
-    // "KV RAJGARH, ALWAR"
-    // vs "KENDRIYA VIDYALAYA RAJGHRH"
-    const candidateText =
-      String(item.name || '') + ' ' +
-      String(item.address || '');
-
-    const candidateWords = words(candidateText);
-
-    let totalScore = 0;
-    let matchedWords = 0;
-
-    wantedWords.forEach(function (wantedWord) {
-
-      let highest = 0;
-
-      candidateWords.forEach(function (candidateWord) {
-
-        const score =
-          similarity(wantedWord, candidateWord);
-
-        if (score > highest) {
-          highest = score;
-        }
+      const allWordsPresent = wantedWords.every(function (word) {
+        return candidateWords.indexOf(word) !== -1;
       });
 
-      // Exact/near-exact word
-      if (highest >= 0.78) {
-        matchedWords++;
-        totalScore += highest;
-      }
+      if (!allWordsPresent) return;
+
+      candidates.push({
+        item: item,
+        regionMatch:
+          wantedRegion && clean(item.region) === wantedRegion,
+        exactName:
+          normaliseSchool(candidateName) === wantedNormal
+      });
     });
 
-    if (!matchedWords) {
-      return;
+    if (!candidates.length) return null;
+
+    const exactNames = candidates.filter(function (c) {
+      return c.exactName;
+    });
+
+    if (exactNames.length === 1) {
+      return exactNames[0].item;
     }
 
-    const coverage =
-      matchedWords / wantedWords.length;
+    const regionCandidates = candidates.filter(function (c) {
+      return c.regionMatch;
+    });
 
-    const average =
-      totalScore / matchedWords;
-
-    const finalScore =
-      (coverage * 0.65) +
-      (average * 0.35);
-
-    if (finalScore > bestScore) {
-      bestScore = finalScore;
-      bestRecord = item;
+    if (regionCandidates.length === 1) {
+      return regionCandidates[0].item;
     }
-  });
 
-  // Require a reasonably strong match.
-  if (bestRecord && bestScore >= 0.58) {
-    return bestRecord;
+    if (candidates.length === 1) {
+      return candidates[0].item;
+    }
+
+    return null;
   }
 
-  return null;
-}
+  /* =======================================================
+     PARTICIPANT AUTO-FILL
+  ======================================================= */
+
   function autoFillParticipant(person) {
 
     if (!person) return;
 
-    // 1. DESIGNATION
     const designation =
       document.querySelector('select[name="designation"]');
 
     if (designation && person.designation) {
-
-      const option =
-        findDesignation(person.designation);
+      const option = findDesignation(person.designation);
 
       if (option) {
         designation.value = option.value;
@@ -1584,115 +1450,432 @@ window.addEventListener('DOMContentLoaded', function () {
       }
     }
 
-    // 2. REGION
-    const region =
-      document.getElementById('kvRegion');
-
-    if (region && person.region) {
-
-      const regionOption =
-        findRegion(person.region);
-
-      if (regionOption) {
-
-        region.value = regionOption.value;
-
-        // Load the KVs for this region directly.
-        loadKVForRegion(region.value);
-      }
-    }
-
-    // 3. KENDRIYA VIDYALAYA
-    const kv =
-      document.getElementById('kvName');
-
     const matchedKV =
       findKV(person.school, person.region);
 
-    if (kv && matchedKV) {
+    const region =
+      document.getElementById('kvRegion');
 
-      kv.value = String(matchedKV.code || '').trim();
+    const kv =
+      document.getElementById('kvName');
 
-      // Fill State, Address, Principal details, Website, etc.
-      fillKVDetails();
+    if (matchedKV) {
 
+      const masterRegion =
+        matchedKV.region || person.region || '';
+
+      const regionOption =
+        findRegion(masterRegion);
+
+      if (region && regionOption) {
+        region.value = regionOption.value;
+        loadKVForRegion(regionOption.value);
+      }
+
+      if (kv) {
+        const code = String(matchedKV.code || '').trim();
+
+        if (
+          code &&
+          !Array.from(kv.options).some(function (option) {
+            return String(option.value).trim() === code;
+          })
+        ) {
+          loadKVForRegion(masterRegion);
+        }
+
+        kv.value = code;
+        fillKVDetails();
+      }
+
+    } else if (region && person.region) {
+
+      const regionOption = findRegion(person.region);
+
+      if (regionOption) {
+        region.value = regionOption.value;
+        loadKVForRegion(regionOption.value);
+      }
     }
 
-    console.log(
-      'Participant auto-fill complete:',
-      {
-        name: person.name,
-        designation: person.designation,
-        region: person.region,
-        school: person.school,
-        matchedKV: matchedKV ? matchedKV.name : 'NOT FOUND'
-      }
-    );
+    console.log('Participant auto-fill complete:', {
+      name: person.name,
+      designation: person.designation,
+      participantRegion: person.region,
+      school: person.school,
+      matchedKV: matchedKV ? matchedKV.name : 'NOT FOUND'
+    });
   }
 
-  fetch(API_URL)
-    .then(function (response) {
+  /* =======================================================
+     CREATE TAB SELECTOR
+  ======================================================= */
+
+  const targetSelect = applicantSelect || participantSelect;
+  const fieldCell = targetSelect.parentElement;
+  const grid = fieldCell.parentElement;
+
+  const tabWrapper = document.createElement('div');
+  tabWrapper.style.gridColumn = '1 / -1';
+  tabWrapper.style.marginBottom = '2px';
+
+  const tabLabel = document.createElement('label');
+  tabLabel.textContent = '📑 Participant Tab / Region';
+  tabLabel.style.display = 'block';
+  tabLabel.style.fontWeight = '800';
+  tabLabel.style.marginBottom = '7px';
+
+  const tabSelect = document.createElement('select');
+  tabSelect.id = 'liveParticipantTab';
+  tabSelect.name = 'liveParticipantTab';
+  tabSelect.style.width = '100%';
+  tabSelect.style.padding = '10px 12px';
+  tabSelect.style.borderRadius = '10px';
+  tabSelect.style.border = '1px solid #dbe7f0';
+  tabSelect.style.background = '#fff';
+
+  const tabPlaceholder = document.createElement('option');
+  tabPlaceholder.value = '';
+  tabPlaceholder.textContent = '-- Select Participant Tab --';
+  tabSelect.appendChild(tabPlaceholder);
+
+  tabWrapper.appendChild(tabLabel);
+  tabWrapper.appendChild(tabSelect);
+
+  /* Put the tab selector on its own full-width row, above Name/Designation. */
+  grid.insertBefore(tabWrapper, fieldCell);
+
+  /* Visible status makes API failures understandable. */
+  const tabStatus = document.createElement('div');
+  tabStatus.id = 'participantTabStatus';
+  tabStatus.style.fontSize = '12px';
+  tabStatus.style.marginTop = '5px';
+  tabStatus.style.color = '#475569';
+  tabWrapper.appendChild(tabStatus);
+
+  /*
+   * Fallback list from the verified spreadsheet-tab response.
+   * This means the selector is populated immediately even if
+   * the browser temporarily blocks the initial API read.
+   */
+  const FALLBACK_SHEETS = [
+    'PRTM JAIPUR',
+    'PRTM PATNA',
+    'PRTLANG.',
+    'PGTBIO',
+    'PRT FLN',
+    'TGT Maths',
+    'TGT(HIND)',
+    'TGT ENGLISH',
+    'PGT ENG',
+    'PGT Geography',
+    'TGT HINDI',
+    'PGT Comm.',
+    'HTSI',
+    'Maths',
+    'CHEM',
+    'VP',
+    'SCMVEC',
+    'HM',
+    'SANS.',
+    'TGT SCIENCE',
+    'List TGT _Maths',
+    'TGT SS'
+  ];
+
+  function addSheetOption(sheetName) {
+    if (!sheetName) return;
+
+    const exists = Array.from(tabSelect.options).some(function (option) {
+      return option.value === sheetName;
+    });
+
+    if (exists) return;
+
+    const option = document.createElement('option');
+    option.value = sheetName;
+    option.textContent = sheetName;
+    tabSelect.appendChild(option);
+  }
+
+  FALLBACK_SHEETS.forEach(addSheetOption);
+
+  tabStatus.textContent =
+    FALLBACK_SHEETS.length + ' spreadsheet tabs available.';
+
+  /* =======================================================
+     PARTICIPANT DROPDOWN HELPERS
+  ======================================================= */
+
+  function clearParticipantSelect(select) {
+    if (!select) return;
+
+    select.innerHTML = '';
+
+    const option = document.createElement('option');
+    option.value = '';
+    option.textContent = '-- Select Participant --';
+    select.appendChild(option);
+  }
+
+  function clearParticipantDropdowns() {
+    clearParticipantSelect(applicantSelect);
+    clearParticipantSelect(participantSelect);
+  }
+
+  function setLoading(select) {
+    if (!select) return;
+
+    select.innerHTML = '';
+
+    const option = document.createElement('option');
+    option.value = '';
+    option.textContent = 'Loading participants...';
+    select.appendChild(option);
+  }
+
+  function populateParticipantSelect(select, participants) {
+    if (!select) return;
+
+    clearParticipantSelect(select);
+
+    const groups = {};
+
+    participants.forEach(function (person) {
+      const groupName = person.region || 'Other';
+
+      if (!groups[groupName]) {
+        groups[groupName] = [];
+      }
+
+      groups[groupName].push(person);
+    });
+
+    Object.keys(groups)
+      .sort()
+      .forEach(function (groupName) {
+
+        const group = document.createElement('optgroup');
+        group.label = groupName;
+
+        groups[groupName]
+          .sort(function (a, b) {
+            return String(a.name || '')
+              .localeCompare(String(b.name || ''));
+          })
+          .forEach(function (person) {
+
+            const option = document.createElement('option');
+
+            option.value =
+              person.name || person.hindiName || '';
+
+            option.textContent = [
+              person.name || person.hindiName || '',
+              person.designation || '',
+              person.school || ''
+            ]
+              .filter(Boolean)
+              .join(' — ');
+
+            option.dataset.person = JSON.stringify(person);
+            group.appendChild(option);
+          });
+
+        select.appendChild(group);
+      });
+  }
+
+  function populateParticipants(participants) {
+    populateParticipantSelect(applicantSelect, participants);
+    populateParticipantSelect(participantSelect, participants);
+  }
+
+  /* =======================================================
+     SELECTED PARTICIPANT -> AUTO-FILL
+  ======================================================= */
+
+  function attachParticipantListener(select) {
+    if (!select) return;
+
+    if (select.dataset.liveAutoFillListener === 'yes') {
+      return;
+    }
+
+    select.dataset.liveAutoFillListener = 'yes';
+
+    select.addEventListener('change', function () {
+
+      const option =
+        select.options[select.selectedIndex];
+
+      if (!option) return;
+
+      let person = null;
+
+      try {
+        person = option.dataset.person
+          ? JSON.parse(option.dataset.person)
+          : null;
+      } catch (error) {
+        console.error(
+          'Participant record could not be read:',
+          error
+        );
+      }
+
+      if (person) {
+        autoFillParticipant(person);
+      }
+    });
+  }
+
+  attachParticipantListener(applicantSelect);
+  attachParticipantListener(participantSelect);
+
+  /* =======================================================
+     API REQUEST HELPER
+  ======================================================= */
+
+  function fetchJSON(url) {
+    return fetch(
+      url +
+      (url.indexOf('?') === -1 ? '?' : '&') +
+      '_ts=' + Date.now(),
+      {
+        method: 'GET',
+        mode: 'cors',
+        cache: 'no-store',
+        redirect: 'follow'
+      }
+    ).then(function (response) {
+
+      if (!response.ok) {
+        throw new Error(
+          'HTTP ' + response.status
+        );
+      }
+
       return response.json();
-    })
+    });
+  }
+
+  /* =======================================================
+     LOAD ALL SHEET TABS
+  ======================================================= */
+
+  fetchJSON(PARTICIPANT_API_URL)
     .then(function (data) {
 
       if (
         !data.success ||
-        !Array.isArray(data.participants)
+        !Array.isArray(data.sheets)
       ) {
         throw new Error(
-          'Participant data could not be loaded.'
+          data.error ||
+          'Spreadsheet tabs were not returned.'
         );
       }
 
-      const participants = data.participants;
+      data.sheets.forEach(addSheetOption);
 
-      const participantSelects =
-        document.querySelectorAll(
-          'select[name="applicantName"], select[name="participant"]'
-        );
-
-      participantSelects.forEach(function (select) {
-
-        select.addEventListener(
-          'change',
-          function () {
-
-            const selectedName =
-              String(select.value || '').trim();
-
-            if (!selectedName) return;
-
-            const person =
-              participants.find(function (p) {
-                return String(p.name || '').trim() === selectedName;
-              }) ||
-              participants.find(function (p) {
-                return String(p.nameHindi || '').trim() === selectedName;
-              });
-
-            if (person) {
-              autoFillParticipant(person);
-            }
-          }
-        );
-
-      });
+      tabStatus.textContent =
+        tabSelect.options.length - 1 +
+        ' spreadsheet tabs available.';
 
       console.log(
-        'Participant auto-fill ready:',
-        participants.length
+        'Participant tabs loaded:',
+        data.sheets.length,
+        data.sheets
       );
-
     })
     .catch(function (error) {
 
+      /* The verified fallback list remains usable. */
+      tabStatus.textContent =
+        (tabSelect.options.length - 1) +
+        ' spreadsheet tabs available.';
+
       console.error(
-        'Participant auto-fill error:',
+        'Could not load participant tabs:',
         error
       );
-
     });
 
-})();</script></body>
+  /* =======================================================
+     TAB SELECTION -> EXACT SHEET
+  ======================================================= */
+
+  tabSelect.addEventListener('change', function () {
+
+    const sheetName =
+      String(this.value || '').trim();
+
+    clearParticipantDropdowns();
+
+    if (!sheetName) {
+      tabStatus.textContent =
+        'Select a spreadsheet tab to load its participants.';
+      return;
+    }
+
+    setLoading(applicantSelect);
+    setLoading(participantSelect);
+
+    tabStatus.textContent =
+      'Loading participants from “' +
+      sheetName +
+      '”...';
+
+    const url =
+      PARTICIPANT_API_URL +
+      '?sheet=' +
+      encodeURIComponent(sheetName);
+
+    fetchJSON(url)
+      .then(function (data) {
+
+        if (
+          !data.success ||
+          !Array.isArray(data.participants)
+        ) {
+          throw new Error(
+            data.error ||
+            'No participant data was returned.'
+          );
+        }
+
+        populateParticipants(data.participants);
+
+        tabStatus.textContent =
+          data.participants.length +
+          ' participants loaded from “' +
+          sheetName +
+          '”.';
+
+        console.log(
+          'Participants loaded from tab:',
+          sheetName,
+          data.participants.length
+        );
+      })
+      .catch(function (error) {
+
+        clearParticipantDropdowns();
+
+        tabStatus.textContent =
+          '⚠️ Could not load participants from “' +
+          sheetName +
+          '”. Please refresh and try again.';
+
+        console.error(
+          'Participant loading error:',
+          error
+        );
+      });
+  });
+
+})();
+</script>
+</body>
 </html>
