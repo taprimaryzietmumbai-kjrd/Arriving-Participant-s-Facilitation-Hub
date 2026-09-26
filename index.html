@@ -1330,6 +1330,175 @@ window.addEventListener('DOMContentLoaded', function () {
 
     });
 
-});</script>
+});
+  // ===== AUTO-FILL PARTICIPANT DETAILS =====
+
+(function () {
+
+  const API_URL =
+    'https://script.google.com/macros/s/AKfycbxOxaBDPB8jzEgZDevEQbCdH0sNnMshtq7GhNWrvUc38-HfWWs12VXVC8UrOin-B6rLRg/exec?action=participants';
+
+  fetch(API_URL)
+    .then(function (response) {
+      return response.json();
+    })
+    .then(function (data) {
+
+      if (
+        !data.success ||
+        !Array.isArray(data.participants)
+      ) {
+        return;
+      }
+
+      const participants = data.participants;
+
+      const participantSelects =
+        document.querySelectorAll(
+          'select[name="applicantName"], select[name="participant"]'
+        );
+
+      participantSelects.forEach(function (participantSelect) {
+
+        participantSelect.addEventListener(
+          'change',
+          function () {
+
+            const selectedName =
+              participantSelect.value.trim();
+
+            if (!selectedName) return;
+
+            const person =
+              participants.find(function (p) {
+                return String(p.name || '').trim() === selectedName;
+              }) ||
+              participants.find(function (p) {
+                return String(p.nameHindi || '').trim() === selectedName;
+              });
+
+            if (!person) return;
+
+
+            // DESIGNATION
+            const designation =
+              document.querySelector(
+                'select[name="designation"]'
+              );
+
+            if (designation && person.designation) {
+
+              const option =
+                Array.from(designation.options).find(
+                  function (opt) {
+                    return (
+                      opt.value.trim() ===
+                      person.designation.trim()
+                    ) ||
+                    opt.textContent.trim() ===
+                    person.designation.trim();
+                  }
+                );
+
+              if (option) {
+
+                designation.value =
+                  option.value;
+
+                designation.dispatchEvent(
+                  new Event('change', {
+                    bubbles: true
+                  })
+                );
+              }
+            }
+
+
+            // KVS REGION
+            const region =
+              document.getElementById('kvRegion');
+
+            if (region && person.region) {
+
+              const option =
+                Array.from(region.options).find(
+                  function (opt) {
+                    return (
+                      opt.value.trim().toLowerCase() ===
+                      person.region.trim().toLowerCase()
+                    ) ||
+                    opt.textContent.trim().toLowerCase() ===
+                    person.region.trim().toLowerCase();
+                  }
+                );
+
+              if (option) {
+
+                region.value =
+                  option.value;
+
+                region.dispatchEvent(
+                  new Event('change', {
+                    bubbles: true
+                  })
+                );
+              }
+            }
+
+
+            // KENDRIYA VIDYALAYA
+            const kv =
+              document.getElementById('kvName');
+
+            if (kv && person.school) {
+
+              const option =
+                Array.from(kv.options).find(
+                  function (opt) {
+                    return (
+                      opt.value.trim().toLowerCase() ===
+                      person.school.trim().toLowerCase()
+                    ) ||
+                    opt.textContent.trim().toLowerCase() ===
+                    person.school.trim().toLowerCase();
+                  }
+                );
+
+              if (option) {
+
+                kv.value =
+                  option.value;
+
+                kv.dispatchEvent(
+                  new Event('change', {
+                    bubbles: true
+                  })
+                );
+              }
+            }
+
+
+            console.log(
+              'Participant details auto-filled:',
+              person.name
+            );
+
+          }
+        );
+
+      });
+
+    })
+    .catch(function (error) {
+
+      console.error(
+        'Participant auto-fill error:',
+        error
+      );
+
+    });
+
+})();
+</script>
 </body>
 </html>
