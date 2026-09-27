@@ -1958,5 +1958,61 @@ document.getElementById("form").addEventListener("submit", async function(e) {
   );
 
 })();
-</script></body>
+// ===== FLATTEN PARTICIPANT DROPDOWN =====
+(function () {
+
+  function flattenParticipantDropdowns() {
+
+    const selects = document.querySelectorAll(
+      'select[name="applicantName"], select[name="participant"]'
+    );
+
+    selects.forEach(function (select) {
+
+      const groups = Array.from(
+        select.querySelectorAll('optgroup')
+      );
+
+      if (!groups.length) return;
+
+      const fragment =
+        document.createDocumentFragment();
+
+      groups.forEach(function (group) {
+
+        Array.from(group.options).forEach(
+          function (option) {
+            fragment.appendChild(option);
+          }
+        );
+
+        group.remove();
+      });
+
+      select.appendChild(fragment);
+    });
+  }
+
+  document.addEventListener(
+    'DOMContentLoaded',
+    function () {
+
+      flattenParticipantDropdowns();
+
+      const observer =
+        new MutationObserver(function () {
+          flattenParticipantDropdowns();
+        });
+
+      observer.observe(
+        document.body,
+        {
+          childList: true,
+          subtree: true
+        }
+      );
+    }
+  );
+
+})();</script></body>
 </html>
