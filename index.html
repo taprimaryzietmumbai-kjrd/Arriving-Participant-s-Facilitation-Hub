@@ -1220,96 +1220,194 @@ document.getElementById("form").addEventListener("submit", async function(e) {
   }
 });
 // ===== LIVE PARTICIPANT LIST FROM GOOGLE SHEET =====
-// Participant data is loaded live from the standalone Apps Script API.
-// The API URL below is the verified working deployment.
+// Live participant list from Google Sheet.
+// Sheet selection controls which participants are displayed.
+// Participants are NOT grouped by their Region column.
 
 (function () {
-  const API_URL = 'https://script.google.com/macros/s/AKfycbxOxaBDPB8jzEgZDevEQbCdH0sNnMshtq7GhNWrvUc38-HfWWs12VXVC8UrOin-B6rLRg/exec';
 
-  const participantSelectorNames = 'select[name="applicantName"], select[name="participant"]';
+  const API_URL =
+    'https://script.google.com/macros/s/AKfycbxOxaBDPB8jzEgZDevEQbCdH0sNnMshtq7GhNWrvUc38-HfWWs12VXVC8UrOin-B6rLRg/exec';
+
   let participants = [];
 
   function getParticipantSelects() {
-    return Array.from(document.querySelectorAll(participantSelectorNames));
+    return Array.from(
+      document.querySelectorAll(
+        'select[name="applicantName"], select[name="participant"]'
+      )
+    );
   }
 
+  // Create the Google Sheet tab selector above the participant dropdown.
   function createSheetSelector() {
+
     const selects = getParticipantSelects();
+
     if (!selects.length) return null;
 
-    let wrapper = document.getElementById('liveParticipantSheetWrapper');
-    if (wrapper) return document.getElementById('liveParticipantSheet');
+    let wrapper =
+      document.getElementById('liveParticipantSheetWrapper');
+
+    if (wrapper) {
+      return document.getElementById('liveParticipantSheet');
+    }
 
     wrapper = document.createElement('div');
+
     wrapper.id = 'liveParticipantSheetWrapper';
-    wrapper.style.cssText = 'width:100%;margin:0 0 14px 0;';
+
+    wrapper.style.cssText =
+      'width:100%;margin:0 0 14px 0;';
 
     const label = document.createElement('label');
+
     label.htmlFor = 'liveParticipantSheet';
-    label.textContent = 'Participant Sheet / Region';
-    label.style.cssText = 'display:block;font-weight:600;margin-bottom:6px;';
+
+    label.textContent =
+      'Participant Sheet / Region';
+
+    label.style.cssText =
+      'display:block;font-weight:600;margin-bottom:6px;';
 
     const select = document.createElement('select');
-    select.id = 'liveParticipantSheet';
-    select.name = 'liveParticipantSheet';
-    select.style.cssText = 'width:100%;box-sizing:border-box;padding:8px 10px;';
 
-    const placeholder = document.createElement('option');
+    select.id = 'liveParticipantSheet';
+
+    select.name = 'liveParticipantSheet';
+
+    select.style.cssText =
+      'width:100%;box-sizing:border-box;padding:8px 10px;';
+
+    const placeholder =
+      document.createElement('option');
+
     placeholder.value = '';
-    placeholder.textContent = 'Loading participant lists...';
+
+    placeholder.textContent =
+      'Select Participant List / Region';
+
     select.appendChild(placeholder);
 
     wrapper.appendChild(label);
+
     wrapper.appendChild(select);
 
     const firstParticipantSelect = selects[0];
-    firstParticipantSelect.parentNode.insertBefore(wrapper, firstParticipantSelect);
+
+    firstParticipantSelect.parentNode.insertBefore(
+      wrapper,
+      firstParticipantSelect
+    );
 
     return select;
   }
 
+
+  // Clear participant dropdown.
   function resetParticipantSelect(select) {
+
     const firstOption = select.options[0];
+
     select.innerHTML = '';
+
     if (firstOption) {
+
+      firstOption.value = '';
+
+      firstOption.textContent =
+        '-- Select Participant --';
+
       select.appendChild(firstOption);
+
     } else {
-      const option = document.createElement('option');
+
+      const option =
+        document.createElement('option');
+
       option.value = '';
-      option.textContent = 'Select Participant';
+
+      option.textContent =
+        '-- Select Participant --';
+
       select.appendChild(option);
     }
   }
 
+
+  // Populate ONLY the participants from the selected sheet.
+  // There is deliberately NO region grouping here.
   function populateParticipants(data) {
-    participants = Array.isArray(data.participants) ? data.participants : [];
+
+    participants =
+      Array.isArray(data.participants)
+        ? data.participants
+        : [];
 
     getParticipantSelects().forEach(function (select) {
+
       resetParticipantSelect(select);
 
-      // The selected Google Sheet tab is the participant list.
-      // Do NOT regroup these participants by their Region field here.
-      // A sheet may contain participants from more than one region.
-      participants.sort(function (a, b) {
-        return String(a.name || a.hindiName || '').localeCompare(
-          String(b.name || b.hindiName || '')
-        );
-      }).forEach(function (person) {
-        const option = document.createElement('option');
-        option.value = String(person.name || person.hindiName || '').trim();
-        option.textContent = String(person.name || person.hindiName || '').trim();
-        if (person.designation) option.textContent += ' — ' + person.designation;
-        if (person.school) option.textContent += ' — ' + person.school;
-        option.dataset.sourceSheet = person.sourceSheet || '';
-        option.dataset.sourceRow = person.sourceRow || '';
-        select.appendChild(option);
-      });
+      participants
+        .slice()
+        .sort(function (a, b) {
+
+          return String(
+            a.name || a.hindiName || ''
+          ).localeCompare(
+            String(
+              b.name || b.hindiName || ''
+            )
+          );
+
+        })
+        .forEach(function (person) {
+
+          const option =
+            document.createElement('option');
+
+          option.value =
+            String(
+              person.name ||
+              person.hindiName ||
+              ''
+            ).trim();
+
+          option.textContent =
+            String(
+              person.name ||
+              person.hindiName ||
+              ''
+            ).trim();
+
+          if (person.designation) {
+
+            option.textContent +=
+              ' — ' + person.designation;
+          }
+
+          if (person.school) {
+
+            option.textContent +=
+              ' — ' + person.school;
+          }
+
+          option.dataset.sourceSheet =
+            person.sourceSheet || '';
+
+          option.dataset.sourceRow =
+            person.sourceRow || '';
+
+          select.appendChild(option);
+        });
     });
 
     bindParticipantChangeHandlers();
   }
 
+
   function clean(value) {
+
     return String(value || '')
       .toUpperCase()
       .replace(/&AMP;/g, '&')
@@ -1319,7 +1417,9 @@ document.getElementById("form").addEventListener("submit", async function(e) {
       .trim();
   }
 
+
   function normaliseSchool(value) {
+
     let text = clean(value);
 
     text = text
@@ -1343,193 +1443,574 @@ document.getElementById("form").addEventListener("submit", async function(e) {
       .replace(/\bNO\b/g, ' ');
 
     // Known spelling variation in the KVS master list.
-    text = text.replace(/RAJGHRH/g, 'RAJGARH');
+    text =
+      text.replace(/RAJGHRH/g, 'RAJGARH');
 
-    return text.replace(/[^A-Z0-9]+/g, ' ').replace(/\s+/g, ' ').trim();
+    return text
+      .replace(/[^A-Z0-9]+/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
   }
+
 
   function schoolWords(value) {
-    return normaliseSchool(value).split(' ').filter(function (word) {
-      return word.length >= 2;
-    });
+
+    return normaliseSchool(value)
+      .split(' ')
+      .filter(function (word) {
+        return word.length >= 2;
+      });
   }
 
+
   function sameRegion(a, b) {
+
     return clean(a) === clean(b);
   }
 
+
+  // Safe KV matching.
+  // Does NOT make a broad fuzzy guess.
   function findKV(school, region) {
-    if (!Array.isArray(KVS_DATA) || !school || !region) return null;
 
-    const wanted = schoolWords(school);
-    if (!wanted.length) return null;
+    if (
+      !Array.isArray(KVS_DATA) ||
+      !school ||
+      !region
+    ) {
+      return null;
+    }
 
-    const candidates = KVS_DATA.filter(function (item) {
-      return sameRegion(item.region, region);
-    });
+    const wanted =
+      schoolWords(school);
+
+    if (!wanted.length) {
+      return null;
+    }
+
+    const candidates =
+      KVS_DATA.filter(function (item) {
+
+        return sameRegion(
+          item.region,
+          region
+        );
+      });
 
     const scored = [];
 
     candidates.forEach(function (item) {
-      const candidateText = String(item.name || '') + ' ' + String(item.address || '');
-      const candidate = schoolWords(candidateText);
-      if (!candidate.length) return;
 
-      const matched = wanted.filter(function (word) {
-        return candidate.indexOf(word) !== -1;
+      const candidateText =
+        String(item.name || '') +
+        ' ' +
+        String(item.address || '');
+
+      const candidate =
+        schoolWords(candidateText);
+
+      if (!candidate.length) {
+        return;
+      }
+
+      const matched =
+        wanted.filter(function (word) {
+
+          return candidate.indexOf(word) !== -1;
+
+        });
+
+      // Every meaningful school token must match.
+      if (
+        matched.length !== wanted.length
+      ) {
+        return;
+      }
+
+      const wantedNumber =
+        wanted.find(function (word) {
+
+          return /^NO[1-9]$/.test(word);
+
+        });
+
+      const candidateHasNumber =
+        wantedNumber
+          ? candidate.indexOf(wantedNumber) !== -1
+          : false;
+
+      let score =
+        matched.length / wanted.length;
+
+      if (
+        wantedNumber &&
+        candidateHasNumber
+      ) {
+        score += 0.25;
+      }
+
+      scored.push({
+        item: item,
+        score: score
       });
-
-      // Every meaningful school token must be present.
-      if (matched.length !== wanted.length) return;
-
-      // Prefer a candidate containing the same number marker when one exists.
-      const wantedNumber = wanted.find(function (word) { return /^NO[1-9]$/.test(word); });
-      const candidateHasNumber = wantedNumber ? candidate.indexOf(wantedNumber) !== -1 : false;
-
-      let score = matched.length / wanted.length;
-      if (wantedNumber && candidateHasNumber) score += 0.25;
-
-      scored.push({ item: item, score: score });
     });
 
-    if (!scored.length) return null;
+    if (!scored.length) {
+      return null;
+    }
 
-    scored.sort(function (a, b) { return b.score - a.score; });
+    scored.sort(function (a, b) {
 
-    // If the top two are equally plausible, do not guess.
-    if (scored.length > 1 && scored[0].score === scored[1].score) return null;
+      return b.score - a.score;
+
+    });
+
+    // Never guess when two KVs are equally plausible.
+    if (
+      scored.length > 1 &&
+      scored[0].score === scored[1].score
+    ) {
+      return null;
+    }
 
     return scored[0].item;
   }
 
+
   function findOption(select, value) {
-    if (!select || !value) return null;
-    const wanted = clean(value);
-    return Array.from(select.options).find(function (option) {
-      return clean(option.value) === wanted || clean(option.textContent) === wanted;
+
+    if (!select || !value) {
+      return null;
+    }
+
+    const wanted =
+      clean(value);
+
+    return Array.from(
+      select.options
+    ).find(function (option) {
+
+      return (
+        clean(option.value) === wanted ||
+        clean(option.textContent) === wanted
+      );
+
     }) || null;
   }
 
+
   function findDesignation(value) {
-    return findOption(document.querySelector('select[name="designation"]'), value);
+
+    return findOption(
+      document.querySelector(
+        'select[name="designation"]'
+      ),
+      value
+    );
   }
+
 
   function findRegion(value) {
-    return findOption(document.getElementById('kvRegion'), value);
+
+    return findOption(
+      document.getElementById('kvRegion'),
+      value
+    );
   }
 
+
+  // Participant → Designation → Region → KV → KV details.
   function autoFillParticipant(person) {
-    if (!person) return;
 
-    const designation = document.querySelector('select[name="designation"]');
-    if (designation && person.designation) {
-      const option = findDesignation(person.designation);
+    if (!person) {
+      return;
+    }
+
+    const designation =
+      document.querySelector(
+        'select[name="designation"]'
+      );
+
+    if (
+      designation &&
+      person.designation
+    ) {
+
+      const option =
+        findDesignation(
+          person.designation
+        );
+
       if (option) {
-        designation.value = option.value;
-        designation.dispatchEvent(new Event('change', { bubbles: true }));
+
+        designation.value =
+          option.value;
+
+        designation.dispatchEvent(
+          new Event(
+            'change',
+            { bubbles: true }
+          )
+        );
       }
     }
 
-    const region = document.getElementById('kvRegion');
-    if (region && person.region) {
-      const regionOption = findRegion(person.region);
+
+    const region =
+      document.getElementById(
+        'kvRegion'
+      );
+
+    if (
+      region &&
+      person.region
+    ) {
+
+      const regionOption =
+        findRegion(
+          person.region
+        );
+
       if (regionOption) {
-        region.value = regionOption.value;
-        if (typeof loadKVForRegion === 'function') loadKVForRegion(region.value);
+
+        region.value =
+          regionOption.value;
+
+        if (
+          typeof loadKVForRegion ===
+          'function'
+        ) {
+
+          loadKVForRegion(
+            region.value
+          );
+        }
       }
     }
 
-    const kv = document.getElementById('kvName');
-    const matchedKV = findKV(person.school, person.region);
 
-    if (kv && matchedKV) {
-      kv.value = String(matchedKV.code || '').trim();
-      if (typeof fillKVDetails === 'function') fillKVDetails();
+    const kv =
+      document.getElementById(
+        'kvName'
+      );
+
+    const matchedKV =
+      findKV(
+        person.school,
+        person.region
+      );
+
+    if (
+      kv &&
+      matchedKV
+    ) {
+
+      kv.value =
+        String(
+          matchedKV.code || ''
+        ).trim();
+
+      if (
+        typeof fillKVDetails ===
+        'function'
+      ) {
+
+        fillKVDetails();
+      }
     }
   }
+
 
   function bindParticipantChangeHandlers() {
-    getParticipantSelects().forEach(function (select) {
-      if (select.dataset.liveParticipantBound === '1') return;
-      select.dataset.liveParticipantBound = '1';
 
-      select.addEventListener('change', function () {
-        const selectedOption = select.options[select.selectedIndex];
-        const selectedName = String(select.value || '').trim();
-        if (!selectedName) return;
+    getParticipantSelects()
+      .forEach(function (select) {
 
-        const sourceSheet = selectedOption ? selectedOption.dataset.sourceSheet : '';
-        const sourceRow = selectedOption ? selectedOption.dataset.sourceRow : '';
+        if (
+          select.dataset.liveParticipantBound ===
+          '1'
+        ) {
+          return;
+        }
 
-        const person = participants.find(function (p) {
-          return String(p.name || '').trim() === selectedName &&
-            (!sourceSheet || String(p.sourceSheet || '') === sourceSheet) &&
-            (!sourceRow || String(p.sourceRow || '') === sourceRow);
-        }) || participants.find(function (p) {
-          return String(p.name || '').trim() === selectedName;
+        select.dataset.liveParticipantBound =
+          '1';
+
+        select.addEventListener(
+          'change',
+          function () {
+
+            const selectedOption =
+              select.options[
+                select.selectedIndex
+              ];
+
+            const selectedName =
+              String(
+                select.value || ''
+              ).trim();
+
+            if (!selectedName) {
+              return;
+            }
+
+            const sourceSheet =
+              selectedOption
+                ? selectedOption.dataset.sourceSheet
+                : '';
+
+            const sourceRow =
+              selectedOption
+                ? selectedOption.dataset.sourceRow
+                : '';
+
+            const person =
+              participants.find(
+                function (p) {
+
+                  return (
+                    String(
+                      p.name || ''
+                    ).trim() ===
+                    selectedName &&
+
+                    (
+                      !sourceSheet ||
+                      String(
+                        p.sourceSheet || ''
+                      ) === sourceSheet
+                    ) &&
+
+                    (
+                      !sourceRow ||
+                      String(
+                        p.sourceRow || ''
+                      ) === sourceRow
+                    )
+                  );
+
+                }
+              ) ||
+
+              participants.find(
+                function (p) {
+
+                  return String(
+                    p.name || ''
+                  ).trim() ===
+                  selectedName;
+
+                }
+              );
+
+            if (person) {
+
+              autoFillParticipant(
+                person
+              );
+            }
+          }
+        );
+      });
+  }
+
+
+  // Load participants from the selected Google Sheet tab.
+  function loadSheet(sheetName) {
+
+    if (!sheetName) {
+
+      getParticipantSelects()
+        .forEach(function (select) {
+
+          resetParticipantSelect(
+            select
+          );
         });
 
-        if (person) autoFillParticipant(person);
-      });
-    });
-  }
+      return;
+    }
 
-  function loadSheet(sheetName) {
-    if (!sheetName) return;
-
-    const url = API_URL + '?sheet=' + encodeURIComponent(sheetName);
+    const url =
+      API_URL +
+      '?sheet=' +
+      encodeURIComponent(
+        sheetName
+      );
 
     fetch(url)
-      .then(function (response) { return response.json(); })
-      .then(function (data) {
-        if (!data.success || !Array.isArray(data.participants)) {
-          throw new Error(data.error || 'Participant data could not be loaded.');
+      .then(function (response) {
+
+        if (!response.ok) {
+
+          throw new Error(
+            'HTTP ' +
+            response.status
+          );
         }
-        populateParticipants(data);
+
+        return response.json();
+
+      })
+      .then(function (data) {
+
+        if (
+          !data.success ||
+          !Array.isArray(
+            data.participants
+          )
+        ) {
+
+          throw new Error(
+            data.error ||
+            'Participant data could not be loaded.'
+          );
+        }
+
+        populateParticipants(
+          data
+        );
+
       })
       .catch(function (error) {
-        console.error('Could not load selected participant list:', error);
+
+        console.error(
+          'Could not load selected participant list:',
+          error
+        );
+
       });
   }
 
+
+  // Load all Google Sheet tab names.
   function loadSheetNames() {
-    const sheetSelector = createSheetSelector();
-    if (!sheetSelector) return;
+
+    const sheetSelector =
+      createSheetSelector();
+
+    if (!sheetSelector) {
+      return;
+    }
 
     fetch(API_URL)
-      .then(function (response) { return response.json(); })
+      .then(function (response) {
+
+        if (!response.ok) {
+
+          throw new Error(
+            'HTTP ' +
+            response.status
+          );
+        }
+
+        return response.json();
+
+      })
       .then(function (data) {
-        if (!data.success || !Array.isArray(data.sheets)) {
-          throw new Error(data.error || 'Participant sheet list could not be loaded.');
+
+        if (
+          !data.success ||
+          !Array.isArray(data.sheets)
+        ) {
+
+          throw new Error(
+            data.error ||
+            'Participant sheet list could not be loaded.'
+          );
         }
 
         sheetSelector.innerHTML = '';
 
-        const placeholder = document.createElement('option');
+        const placeholder =
+          document.createElement(
+            'option'
+          );
+
         placeholder.value = '';
-        placeholder.textContent = 'Select Participant List / Region';
-        sheetSelector.appendChild(placeholder);
 
-        data.sheets.forEach(function (sheetName) {
-          const option = document.createElement('option');
-          option.value = sheetName;
-          option.textContent = sheetName;
-          sheetSelector.appendChild(option);
-        });
+        placeholder.textContent =
+          'Select Participant List / Region';
 
-        sheetSelector.addEventListener('change', function () {
-          loadSheet(sheetSelector.value);
-        });
+        sheetSelector.appendChild(
+          placeholder
+        );
+
+        data.sheets.forEach(
+          function (sheetName) {
+
+            const option =
+              document.createElement(
+                'option'
+              );
+
+            option.value =
+              sheetName;
+
+            option.textContent =
+              sheetName;
+
+            sheetSelector.appendChild(
+              option
+            );
+          }
+        );
+
+        sheetSelector.addEventListener(
+          'change',
+          function () {
+
+            loadSheet(
+              sheetSelector.value
+            );
+
+          }
+        );
+
       })
       .catch(function (error) {
-        console.error('Could not load participant sheet list:', error);
+
+        console.error(
+          'Could not load participant sheet list:',
+          error
+        );
+
       });
   }
 
-  document.addEventListener('DOMContentLoaded', function () {
-    loadSheetNames();
-    bindParticipantChangeHandlers();
-  });
+
+  document.addEventListener(
+    'DOMContentLoaded',
+    function () {
+
+      // Do not make external requests from
+      // GitHub's built-in editor Preview.
+      // The published github.io site WILL load
+      // the live Apps Script data.
+
+      const host =
+        String(
+          window.location.hostname || ''
+        ).toLowerCase();
+
+      const isGitHubEditorPreview =
+        host === 'github.com' ||
+        host.endsWith('.github.com') ||
+        host === 'github.dev' ||
+        host.endsWith('.github.dev');
+
+      if (
+        isGitHubEditorPreview
+      ) {
+        return;
+      }
+
+      loadSheetNames();
+
+      bindParticipantChangeHandlers();
+    }
+  );
+
 })();
 </script></body>
 </html>
