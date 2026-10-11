@@ -87,7 +87,7 @@ button.action{border:0;border-radius:11px;padding:13px 19px;font-size:15px;font-
   <div class="small">केन्द्रीय विद्यालय संगठन, आंचलिक शिक्षा एवं प्रशिक्षण संस्थान, मुंबई</div>
   <div class="small">KENDRIYA VIDYALAYA SANGATHAN (KVS) ZONAL INSTITUTE OF EDUCATION AND TRAINING (ZIET) MUMBAI</div>
   <h1>Participants' Facilitator's Assistance Sheet</h1>
-  <p><strong>5 Day Face-to-Face Training Workshop on "Developing Leadership Competencies for Academic Excellence"</strong></p>
+  <p><strong>5 Day Face-to-Face Training Workshop on "<span id="dynamicWorkshopTitle">Loading workshop title…</span>"</strong></p>
   <p>For Vice-Principals • 07.09.2026 to 11.09.2026 • Ahmedabad, Jaipur, Mumbai, Patna &amp; Raipur</p>
   <span class="badge">🌟 Together for a Smooth, Supportive &amp; Successful Training Experience</span>
 </header>
@@ -630,15 +630,18 @@ const COURSE_SOURCE_SPREADSHEET_ID = "1Uuqoz2KFpTcw9d2HI02fLmFPopTaLnKWwZ9aR-uYC
 function loadCourseTitleFromSourceSheet(sheetName) {
   const field = document.getElementById("courseName");
   const status = document.getElementById("courseTitleStatus");
+  const heading = document.getElementById("dynamicWorkshopTitle");
   if (!field || !status) return;
   if (!sheetName) {
     field.value = "";
+    if (heading) heading.textContent = "Select a participant tab";
     status.textContent = "Select a participant list to load its course title.";
     status.style.color = "";
     return;
   }
 
   field.value = "";
+  if (heading) heading.textContent = "Loading…";
   status.textContent = "Loading course title from tab: " + sheetName + "…";
   status.style.color = "";
 
@@ -653,6 +656,7 @@ function loadCourseTitleFromSourceSheet(sheetName) {
     if (script && script.parentNode) script.parentNode.removeChild(script);
     status.textContent = message;
     status.style.color = success ? "#13763b" : "#a02222";
+    if (!success && heading && heading.textContent === "Loading…") heading.textContent = "Course title unavailable";
   }
 
   window[callbackName] = function (response) {
@@ -692,6 +696,7 @@ function loadCourseTitleFromSourceSheet(sheetName) {
         return;
       }
       field.value = title;
+      if (heading) heading.textContent = title;
       finish('Course title loaded from the Title column in "' + sheetName + '".', true);
     } catch (error) {
       finish("Could not process the title returned by Google Sheets.", false);
