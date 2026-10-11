@@ -761,7 +761,16 @@ function updateFacilitatorContact(name) {
   numberEl.textContent = contact.mobile ? 'Mobile / WhatsApp: ' + contact.mobile : 'Mobile / WhatsApp: not listed';
   emailEl.textContent = contact.email ? 'Email: ' + contact.email : 'Email: not listed';
   if (phone) {
-    link.href = 'https://wa.me/' + phone + '?text=' + encodeURIComponent('Dear ' + contact.name + ', I am a participant attending the ZIET Mumbai training programme. I am contacting you regarding arrival facilitation.');
+    const participantName = String(document.querySelector('[name="participant"]')?.value || '').trim();
+    const arrivalDate = String(document.querySelector('[name="arrivalDate"]')?.value || '').trim();
+    const arrivalTime = String(document.querySelector('[name="arrivalTime"]')?.value || '').trim();
+    const arrivalDetails = [
+      participantName ? 'Participant: ' + participantName : '',
+      arrivalDate ? 'Arrival date: ' + arrivalDate : '',
+      arrivalTime ? 'Arrival time: ' + arrivalTime : ''
+    ].filter(Boolean).join('\\n');
+    const message = 'Dear ' + contact.name + ', I am a participant attending the ZIET Mumbai training programme. I am contacting you regarding arrival facilitation.' + (arrivalDetails ? '\\n\\n' + arrivalDetails : '');
+    link.href = 'https://wa.me/' + phone + '?text=' + encodeURIComponent(message);
     link.style.display = 'inline-block';
     link.textContent = 'Open WhatsApp';
     note.textContent = 'WhatsApp will open with a prepared message. Review and send it yourself.';
@@ -785,6 +794,15 @@ document.querySelectorAll('[data-facilitator-select="true"]').forEach(function(s
   });
 });
 loadFacilitatorContacts();
+
+// Keep the prepared WhatsApp message synchronized with the participant's arrival details.
+['participant', 'arrivalDate', 'arrivalTime'].forEach(function(fieldName) {
+  const field = document.querySelector('[name="' + fieldName + '"]');
+  if (field) field.addEventListener('change', function() {
+    const facilitator = document.querySelector('[data-facilitator-select="true"]');
+    if (facilitator && facilitator.value) updateFacilitatorContact(facilitator.value);
+  });
+});
 
 function focusSection(id, btn) {
   document.getElementById(id).scrollIntoView({behavior:"smooth",block:"start"});
