@@ -748,8 +748,8 @@ function updateFacilitatorContact(name) {
         participantName ? 'Participant: ' + participantName : '',
         arrivalDate ? 'Arrival date: ' + arrivalDate : '',
         arrivalTime ? 'Arrival time: ' + arrivalTime : ''
-      ].filter(Boolean).join('\\n');
-      const message = 'Dear ' + contact.name + ', I am a participant attending the ZIET Mumbai training programme. I am contacting you regarding arrival facilitation.' + (arrivalDetails ? '\\n\\n' + arrivalDetails : '');
+      ].filter(Boolean).join('\n');
+      const message = 'Dear ' + contact.name + ', I am a participant attending the ZIET Mumbai training programme. I am contacting you regarding arrival facilitation.' + '\n\nParticipant: ' + participantName + '\nArrival date: ' + arrivalDate + '\nArrival time: ' + arrivalTime;
       return 'https://wa.me/' + phone + '?text=' + encodeURIComponent(message);
     }
     link.href = buildArrivalWhatsAppUrl();
@@ -791,9 +791,11 @@ loadFacilitatorContacts();
 // Keep the prepared WhatsApp message synchronized with the participant's arrival details.
 ['participant', 'arrivalDate', 'arrivalTime'].forEach(function(fieldName) {
   const field = document.querySelector('[name="' + fieldName + '"]');
-  if (field) field.addEventListener('change', function() {
-    const facilitator = document.querySelector('[data-facilitator-select="true"]');
-    if (facilitator && facilitator.value) updateFacilitatorContact(facilitator.value);
+  if (field) ['input', 'change'].forEach(function(eventName) {
+    field.addEventListener(eventName, function() {
+      const facilitator = document.querySelector('[data-facilitator-select="true"]');
+      if (facilitator && facilitator.value) updateFacilitatorContact(facilitator.value);
+    });
   });
 });
 
