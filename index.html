@@ -748,8 +748,8 @@ function updateFacilitatorContact(name) {
         participantName ? 'Participant: ' + participantName : '',
         arrivalDate ? 'Arrival date: ' + arrivalDate : '',
         arrivalTime ? 'Arrival time: ' + arrivalTime : ''
-      ].filter(Boolean).join('\n');
-      const message = 'Dear ' + contact.name + ', I am a participant attending the ZIET Mumbai training programme. I am contacting you regarding arrival facilitation.' + '\n\nParticipant: ' + participantName + '\nArrival date: ' + arrivalDate + '\nArrival time: ' + arrivalTime;
+      ].filter(Boolean).join('\\n');
+      const message = 'Dear ' + contact.name + ', I am a participant attending the ZIET Mumbai training programme. I am contacting you regarding arrival facilitation.' + '\\n\\nParticipant: ' + participantName + '\\nArrival date: ' + arrivalDate + '\\nArrival time: ' + arrivalTime;
       return 'https://wa.me/' + phone + '?text=' + encodeURIComponent(message);
     }
     link.href = buildArrivalWhatsAppUrl();
