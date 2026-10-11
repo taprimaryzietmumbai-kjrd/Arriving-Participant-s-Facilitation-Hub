@@ -87,7 +87,7 @@ button.action{border:0;border-radius:11px;padding:13px 19px;font-size:15px;font-
   <div class="small">केन्द्रीय विद्यालय संगठन, आंचलिक शिक्षा एवं प्रशिक्षण संस्थान, मुंबई</div>
   <div class="small">KENDRIYA VIDYALAYA SANGATHAN (KVS) ZONAL INSTITUTE OF EDUCATION AND TRAINING (ZIET) MUMBAI</div>
   <h1>Participants' Facilitator's Assistance Sheet</h1>
-  <p><strong>5 Day Face-to-Face Training Workshop on "<span id="dynamicWorkshopTitle">Loading workshop title…</span>"</strong></p>
+  <p><strong>5 Day Face-to-Face Training Workshop on <span id="dynamicWorkshopTitle">Loading workshop title…</span></strong></p>
   <p>&quot;For <span id="dynamicTargetGroup">Loading target group…</span> from <span id="dynamicCourseDates">Loading course dates…</span>&quot;</p>
   <span class="badge">🌟 Together for a Smooth, Supportive &amp; Successful Training Experience</span>
 </header>
@@ -694,7 +694,7 @@ function loadCourseTitleFromSourceSheet(sheetName) {
         finish('No course metadata was found in the selected tab "' + sheetName + '".', false);
         return;
       }
-      const title = cellText(metadataRow, titleColumn);
+      const title = cellText(metadataRow, titleColumn).trim().replace(/^["“”]+|["“”]+$/g, "").trim();
       const targetGroup = targetColumn >= 0 ? cellText(metadataRow, targetColumn) : "";
       const fromDate = fromColumn >= 0 ? cellText(metadataRow, fromColumn) : "";
       const toDate = toColumn >= 0 ? cellText(metadataRow, toColumn) : "";
@@ -2013,7 +2013,7 @@ document.getElementById("form").addEventListener("submit", async function(e) {
           });
           if (firstWithTitle) {
             for (let i = 0; i < titleKeys.length; i++) {
-              const candidate = String(firstWithTitle[titleKeys[i]] || '').trim();
+              const candidate = String(firstWithTitle[titleKeys[i]] || '').trim().replace(/^["“”]+|["“”]+$/g, "").trim();
               if (candidate) {
                 liveTitle = candidate;
                 break;
