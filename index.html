@@ -761,7 +761,7 @@ function updateFacilitatorContact(name) {
   numberEl.textContent = contact.mobile ? 'Mobile / WhatsApp: ' + contact.mobile : 'Mobile / WhatsApp: not listed';
   emailEl.textContent = contact.email ? 'Email: ' + contact.email : 'Email: not listed';
   if (phone) {
-    link.href = 'https://wa.me/' + phone + '?text=' + encodeURIComponent('Hello ' + contact.name + ', I am a participant attending the ZIET Mumbai training programme. I am contacting you regarding arrival facilitation.');
+    link.href = 'https://wa.me/' + phone + '?text=' + encodeURIComponent('Dear ' + contact.name + ', I am a participant attending the ZIET Mumbai training programme. I am contacting you regarding arrival facilitation.');
     link.style.display = 'inline-block';
     link.textContent = 'Open WhatsApp';
     note.textContent = 'WhatsApp will open with a prepared message. Review and send it yourself.';
