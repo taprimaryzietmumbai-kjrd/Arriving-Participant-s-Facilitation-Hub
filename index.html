@@ -2032,10 +2032,11 @@ document.getElementById("form").addEventListener("submit", async function(e) {
             courseStatus.textContent = 'Course title loaded from the selected participant tab: ' + sheetName + '.';
             courseStatus.style.color = '#13763b';
           }
-        } else {
-          // Fall back to reading the exact selected tab's Title column (M).
-          loadCourseTitleFromSourceSheet(sheetName);
         }
+
+        // Load header metadata (target group and From/To dates) from the
+        // selected source tab even when the API already supplied the title.
+        loadCourseTitleFromSourceSheet(sheetName);
 
         populateParticipants(
           data
