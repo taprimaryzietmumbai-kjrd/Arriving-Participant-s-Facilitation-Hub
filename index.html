@@ -100,7 +100,7 @@ button.action{border:0;border-radius:11px;padding:13px 19px;font-size:15px;font-
     <button class="tab" type="button" onclick="focusSection('facilitation',this)">🤝 Facilitation</button>
     <button class="tab" type="button" onclick="focusSection('details',this)">ℹ️ Details</button>
     <button class="tab" type="button" onclick="focusSection('payment',this)">💳 Payment</button>
-    <button class="tab" type="button" onclick="focusSection('verification',this)">🖊️ Official Verification</button></div>
+</div>
 
   <form id="form" class="card">
     
@@ -587,42 +587,7 @@ button.action{border:0;border-radius:11px;padding:13px 19px;font-size:15px;font-
     
     <section id="verification" class="section green">
       <h2>🖊️ Official Verification</h2>
-      <div class="grid">
-        <div>
-          <label>👨‍💼 Name of Official</label>
-          <select name="officialName" id="officialName" required>
-            <option value="">-- Select Verifying Official --</option>
-            <option value="Mr. Shreyash N. Kamble, JSA">Mr. Shreyash N. Kamble, JSA</option>
-            <option value="Mrs. Joyce. P. Jebarai, Steno Gr. I">Mrs. Joyce. P. Jebarai, Steno Gr. I</option>
-            <option value="Mrs. Deepali D. Khadye, SSA">Mrs. Deepali D. Khadye, SSA</option>
-          </select>
-        </div>
-        <div class="full">
-          <label>📝 Whether Registration Completed *</label>
-          <select name="registrationStatus" required>
-            <option value="">-- Select Registration Status --</option>
-            <option value="YES">YES</option>
-            <option value="NO">NO</option>
-            <option value="Yet to be done">Yet to be done</option>
-            <option value="Relieving Order not submitted">Relieving Order not submitted</option>
-            <option value="Payment not completed">Payment not completed</option>
-            <option value="Payment screenshot not made available">Payment screenshot not made available</option>
-          </select>
-        </div>
-      </div>
-      <div class="signature-box" style="margin-top:14px">
-        <label>🖊️ Signature of Official</label>
-        <canvas id="officialSignatureCanvas" class="signature-canvas"></canvas>
-        <input type="hidden" name="officialSignature" id="officialSignature">
-        <div class="signature-actions">
-          <button type="button" class="clear-signature" onclick="clearSignature('official')">Clear Official Signature</button>
-        </div>
-      </div>
-    </section>
-
-<section class="section purple">
-      <h2>✍️ Final Signatures</h2>
-      <p class="note">Both signatures can be drawn directly on the screen using a mouse, stylus or mobile touch screen.</p>
+      <div class="grirawn directly on the screen using a mouse, stylus or mobile touch screen.</p>
       <div class="signature-grid">
         <div class="signature-box">
           <label>👤 Facilitator Name *</label>
@@ -1302,11 +1267,9 @@ document.getElementById("form").addEventListener("submit", async function(e) {
   const form = this;
   const btn = document.getElementById("submitBtn");
   const status = document.getElementById("status");
-  const officialCanvas = document.getElementById("officialSignatureCanvas");
   const facilitatorCanvas = document.getElementById("facilitatorSignatureCanvas");
   const participantCanvas = document.getElementById("participantSignatureCanvas");
 
-  document.getElementById("officialSignature").value = officialCanvas.toDataURL("image/png");
   document.getElementById("facilitatorSignature").value = facilitatorCanvas.toDataURL("image/png");
   document.getElementById("participantSignature").value = participantCanvas.toDataURL("image/png");
 
@@ -1351,7 +1314,7 @@ document.getElementById("form").addEventListener("submit", async function(e) {
     status.className = "status ok";
     status.textContent = '✅ ' + (result.message || 'Record saved successfully.') + (result.row ? ' Spreadsheet row: ' + result.row + '.' : '');
     form.reset();
-    clearSignature("official"); clearSignature("facilitator"); clearSignature("participant");
+    clearSignature("facilitator"); clearSignature("participant");
     updateFacilitatorContact('');
   } catch (err) {
     status.className = "status err";
