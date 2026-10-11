@@ -1984,6 +1984,49 @@ document.getElementById("form").addEventListener("submit", async function(e) {
           );
         }
 
+        // Use the selected tab's live participant API response as the first
+        // source for its workshop title. This avoids relying only on the
+        // public Google Visualization endpoint, which may not be enabled.
+        const titleKeys = [
+          'title', 'Title', 'courseTitle', 'workshopTitle',
+          'courseName', 'workshop', 'course', 'Workshop / Course'
+        ];
+        let liveTitle = String(
+          data.courseTitle || data.workshopTitle || data.title || ''
+        ).trim();
+
+        if (!liveTitle && data.participants.length) {
+          const firstWithTitle = data.participants.find(function (person) {
+            return titleKeys.some(function (key) {
+              return String(person && person[key] || '').trim() !== '';
+            });
+          });
+          if (firstWithTitle) {
+            for (let i = 0; i < titleKeys.length; i++) {
+              const candidate = String(firstWithTitle[titleKeys[i]] || '').trim();
+              if (candidate) {
+                liveTitle = candidate;
+                break;
+              }
+            }
+          }
+        }
+
+        if (liveTitle) {
+          const courseField = document.getElementById('courseName');
+          const courseHeading = document.getElementById('dynamicWorkshopTitle');
+          const courseStatus = document.getElementById('courseTitleStatus');
+          if (courseField) courseField.value = liveTitle;
+          if (courseHeading) courseHeading.textContent = liveTitle;
+          if (courseStatus) {
+            courseStatus.textContent = 'Course title loaded from the selected participant tab: ' + sheetName + '.';
+            courseStatus.style.color = '#13763b';
+          }
+        } else {
+          // Fall back to reading the exact selected tab's Title column (M).
+          loadCourseTitleFromSourceSheet(sheetName);
+        }
+
         populateParticipants(
           data
         );
