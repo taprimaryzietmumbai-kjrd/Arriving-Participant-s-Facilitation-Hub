@@ -479,7 +479,8 @@ button.action{border:0;border-radius:11px;padding:13px 19px;font-size:15px;font-
       <div class="grid">
         <div>
           <label class="icon-label"><span class="icon">📖</span>Name of the Course *</label>
-          <input name="course" value="Developing Leadership Competencies for Academic Excellence" required>
+          <input name="course" id="courseName" readonly placeholder="Loading course title from Google Sheet tab…" required aria-describedby="courseTitleStatus">
+          <small id="courseTitleStatus" class="note" role="status">Course title will be loaded from the selected Google Sheet tab.</small>
         </div>
         <div>
           <label class="icon-label"><span class="icon">🧑‍💼</span>Name of the Course Coordinator *</label>
@@ -1981,16 +1982,42 @@ document.getElementById("form").addEventListener("submit", async function(e) {
           }
         );
 
+        const courseTitleInput = document.getElementById('courseName');
+        const courseTitleStatus = document.getElementById('courseTitleStatus');
+
+        function syncCourseTitleFromTab(sheetName) {
+          const title = String(sheetName || '').trim();
+          if (courseTitleInput) {
+            courseTitleInput.value = title;
+          }
+          if (courseTitleStatus) {
+            courseTitleStatus.textContent = title
+              ? 'Automatically loaded from Google Sheet tab: ' + title
+              : 'Select a Google Sheet tab to load its title automatically.';
+            courseTitleStatus.style.color = title ? '#13763b' : '#a02222';
+          }
+        }
+
         sheetSelector.addEventListener(
           'change',
           function () {
-
-            loadSheet(
-              sheetSelector.value
-            );
-
+            syncCourseTitleFromTab(sheetSelector.value);
+            loadSheet(sheetSelector.value);
           }
         );
+
+        // Automatically select the first real tab returned by the spreadsheet,
+        // so the course title is populated without typing it into the form.
+        const firstSheet = data.sheets.find(function (name) {
+          return String(name || '').trim().length > 0;
+        });
+        if (firstSheet) {
+          sheetSelector.value = firstSheet;
+          syncCourseTitleFromTab(firstSheet);
+          loadSheet(firstSheet);
+        } else {
+          syncCourseTitleFromTab('');
+        }
 
       })
       .catch(function (error) {
