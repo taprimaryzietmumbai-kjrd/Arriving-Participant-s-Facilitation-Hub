@@ -666,28 +666,29 @@ function loadCourseTitleFromSourceSheet(sheetName) {
       const labels = cols.map(function (col) {
         return String((col && (col.label || col.id)) || "").trim().toLowerCase();
       });
+      // In the source workbook, the course-title header is in column M.
+      // Prefer the detected "Title" header; use column M (zero-based index 12)
+      // as a robust fallback if Google Visualization omits the header label.
       const titleIndex = labels.findIndex(function (label) {
-        return /^(title|title of workshop|workshop title|course title)$/.test(label);
+        return /^title$/.test(label);
       });
-      const workshopIndex = labels.findIndex(function (label) {
-        return /^(workshop \/ course|workshop|course|name of the course)$/.test(label);
-      });
+      const titleColumnIndex = titleIndex >= 0 ? titleIndex : 12;
       function cellText(row, index) {
         if (index < 0 || !row || !row.c || !row.c[index]) return "";
         const cell = row.c[index];
         return String(cell.v == null ? (cell.f || "") : cell.v).trim();
       }
-      const titleColumn = titleIndex >= 0 ? titleIndex : workshopIndex;
+      const titleColumn = titleColumnIndex;
       const titleRow = rows.find(function (item) {
         return cellText(item, titleColumn) !== "";
       });
       if (!titleRow) {
-        finish('No non-empty value was found under the Title column in tab "' + sheetName + '".', false);
+        finish('No non-empty value was found in column M (Title) of tab "' + sheetName + '".', false);
         return;
       }
       const title = cellText(titleRow, titleColumn);
       if (!title) {
-        finish("No Title or Workshop / Course value was found in the source tab.", false);
+        finish('No value was found in column M (Title) of tab "' + sheetName + '".', false);
         return;
       }
       field.value = title;
