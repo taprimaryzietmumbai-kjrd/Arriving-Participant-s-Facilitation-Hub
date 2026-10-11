@@ -625,14 +625,22 @@ n>
 const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw5xq8dvfMlaFE4Go6yIyFaCjRr2WMzyyS0bozW29LB3u9SNujZlfmbZAOCDrxIIwe4/exec";
 
 const COURSE_SOURCE_SPREADSHEET_ID = "1Uuqoz2KFpTcw9d2HI02fLmFPopTaLnKWwZ9aR-uYCeY";
-const COURSE_SOURCE_TAB = "selectable";
-
-// Read the actual title/workshop value from the designated source sheet.
-// This is deliberately separate from the participant-list tab selector.
-function loadCourseTitleFromSourceSheet() {
+// Course title is read from the Title column of the SAME tab selected for participants.
+// Do not hard-code a tab name: each region/programme tab has its own Title column.
+function loadCourseTitleFromSourceSheet(sheetName) {
   const field = document.getElementById("courseName");
   const status = document.getElementById("courseTitleStatus");
   if (!field || !status) return;
+  if (!sheetName) {
+    field.value = "";
+    status.textContent = "Select a participant list to load its course title.";
+    status.style.color = "";
+    return;
+  }
+
+  field.value = "";
+  status.textContent = "Loading course title from tab: " + sheetName + "…";
+  status.style.color = "";
 
   const callbackName = "__zietCourseTitle_" + Date.now();
   let script;
@@ -650,7 +658,7 @@ function loadCourseTitleFromSourceSheet() {
   window[callbackName] = function (response) {
     try {
       if (!response || response.status === "error" || !response.table) {
-        finish("Could not read the workshop title from the Google Sheet. Check that the sheet is accessible by link.", false);
+        finish('Could not read the Title column from tab "' + sheetName + '". Check that the spreadsheet is accessible for viewing.', false);
         return;
       }
       const cols = response.table.cols || [];
@@ -664,27 +672,26 @@ function loadCourseTitleFromSourceSheet() {
       const workshopIndex = labels.findIndex(function (label) {
         return /^(workshop \/ course|workshop|course|name of the course)$/.test(label);
       });
-      const row = rows.find(function (item) {
-        return item && Array.isArray(item.c) && item.c.some(function (cell) {
-          return cell && String(cell.v == null ? cell.f || "" : cell.v).trim();
-        });
-      });
-      if (!row) {
-        finish("The source Google Sheet returned no title data.", false);
-        return;
-      }
-      function cellText(index) {
-        if (index < 0 || !row.c[index]) return "";
+      function cellText(row, index) {
+        if (index < 0 || !row || !row.c || !row.c[index]) return "";
         const cell = row.c[index];
         return String(cell.v == null ? (cell.f || "") : cell.v).trim();
       }
-      const title = cellText(titleIndex) || cellText(workshopIndex);
+      const titleColumn = titleIndex >= 0 ? titleIndex : workshopIndex;
+      const titleRow = rows.find(function (item) {
+        return cellText(item, titleColumn) !== "";
+      });
+      if (!titleRow) {
+        finish('No non-empty value was found under the Title column in tab "' + sheetName + '".', false);
+        return;
+      }
+      const title = cellText(titleRow, titleColumn);
       if (!title) {
         finish("No Title or Workshop / Course value was found in the source tab.", false);
         return;
       }
       field.value = title;
-      finish("Course title loaded automatically from the designated Google Sheet.", true);
+      finish('Course title loaded from the Title column in "' + sheetName + '".', true);
     } catch (error) {
       finish("Could not process the title returned by Google Sheets.", false);
     }
@@ -692,11 +699,11 @@ function loadCourseTitleFromSourceSheet() {
 
   script = document.createElement("script");
   script.onerror = function () {
-    finish("Google Sheet title could not be loaded. Verify that the source sheet is shared for viewing.", false);
+    finish('Could not load the Title column from tab "' + sheetName + '". Verify that the spreadsheet is accessible for viewing.', false);
   };
   script.src = "https://docs.google.com/spreadsheets/d/" +
     COURSE_SOURCE_SPREADSHEET_ID +
-    "/gviz/tq?sheet=" + encodeURIComponent(COURSE_SOURCE_TAB) +
+    "/gviz/tq?sheet=" + encodeURIComponent(sheetName) +
     "&headers=1&tqx=" + encodeURIComponent("out:json;responseHandler:" + callbackName);
   document.head.appendChild(script);
 }
@@ -2064,6 +2071,7 @@ document.getElementById("form").addEventListener("submit", async function(e) {
           'change',
           function () {
             loadSheet(sheetSelector.value);
+            loadCourseTitleFromSourceSheet(sheetSelector.value);
           }
         );
 
@@ -2074,6 +2082,7 @@ document.getElementById("form").addEventListener("submit", async function(e) {
         if (firstSheet) {
           sheetSelector.value = firstSheet;
           loadSheet(firstSheet);
+          loadCourseTitleFromSourceSheet(firstSheet);
         }
 
       })
@@ -2092,8 +2101,7 @@ document.getElementById("form").addEventListener("submit", async function(e) {
     'DOMContentLoaded',
     function () {
 
-      loadCourseTitleFromSourceSheet();
-
+      // Course title is loaded after the participant tab list resolves and selects a tab.
       // Do not make external requests from
       // GitHub's built-in editor Preview.
       // The published github.io site WILL load
