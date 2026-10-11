@@ -1,40 +1,47 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ZIET Mumbai Admin Verification</title><script src="https://accounts.google.com/gsi/client" async defer></script><style>
-:root{--navy:#123b63;--blue:#1769aa;--sky:#eaf4ff;--teal:#087f8c;--purple:#7653b5;--ink:#1b2c42;--muted:#60738a;--line:#d9e5f2;--paper:#fff;--bg:#eef4fb;--green:#147a52;--shadow:0 12px 34px rgba(24,58,95,.10)}
+:root{--navy:#10365d;--blue:#1677c8;--teal:#089b91;--purple:#7857c8;--orange:#f2a33a;--ink:#1b2d43;--muted:#5e7188;--line:#d8e4f1;--bg:#f2f7fd;--green:#14794f}
 *{box-sizing:border-box}
-body{font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif;background:radial-gradient(circle at 12% 8%,#e0efff 0,transparent 32%),linear-gradient(135deg,#f4f7fc,#eaf1fa);margin:0;color:var(--ink)}
-header{background:linear-gradient(115deg,#10365d,#176ca0 65%,#168a91);color:white;padding:22px clamp(16px,3vw,34px);box-shadow:0 4px 18px #153d612b;position:relative;overflow:hidden}
-header:after{content:"";position:absolute;width:190px;height:190px;border:1px solid #ffffff38;border-radius:50%;right:6%;top:-110px;box-shadow:0 0 0 24px #ffffff0d,0 0 0 48px #ffffff0a}
-header b{font-size:clamp(17px,2vw,22px);letter-spacing:.35px}header div{opacity:.94;font-size:14px}
-main{max-width:1100px;margin:28px auto;padding:0 16px 36px}
-.card{background:var(--paper);border:1px solid #dce7f3;border-radius:18px;padding:clamp(16px,2.3vw,26px);margin:16px 0;box-shadow:var(--shadow)}
-h2{color:var(--navy);margin:0 0 12px;font-size:clamp(22px,3vw,29px)}
-p{margin:10px 0}
-#signin{margin:12px 0}
-.status{padding:12px 15px;background:linear-gradient(110deg,#edf5ff,#f1f0ff);border:1px solid #dce8fa;border-left:4px solid var(--blue);border-radius:11px;white-space:pre-wrap;overflow-wrap:anywhere;color:#1d4267}
-.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
-input,button,select{font:inherit;padding:11px 13px;border:1px solid #c8d7e8;border-radius:10px;transition:border-color .18s,box-shadow .18s,transform .18s}
-input,select{background:#fff;color:var(--ink);min-height:42px}
-input:focus,select:focus{outline:none;border-color:#2785ca;box-shadow:0 0 0 3px #2785ca24}
-#q{min-width:min(250px,100%);flex:1;max-width:360px}
-button{cursor:pointer;background:linear-gradient(135deg,#1769aa,#164d84);color:white;border:0;font-weight:650;box-shadow:0 3px 8px #164d8420}
-button:hover{transform:translateY(-1px);box-shadow:0 7px 16px #164d8430}
-button:disabled{opacity:.6;cursor:wait;transform:none}
-.record{padding:20px;margin:14px 0;border:1px solid var(--line);border-left:5px solid #3a87c8;border-radius:15px;background:linear-gradient(120deg,#fff,#f9fbff);box-shadow:0 4px 15px #153d610c}
-.record:nth-child(3n+2){border-left-color:#11a0a0}.record:nth-child(3n){border-left-color:#8a69c7}
-.record h3{margin:0 0 5px;color:#153f68;font-size:19px}
-.record>p:first-of-type{color:var(--muted);font-size:14px;margin:4px 0 14px}
-.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));gap:14px;margin:16px 0}
-.fields label,.sigwrap>label{display:block;font-size:13px;font-weight:750;color:#3b536d;margin-bottom:6px;letter-spacing:.15px}
-.fields input,.fields select{display:block;width:100%;margin-top:5px}
-.fields input[readonly]{background:#f1f6fc;color:#526a82}
-.sigwrap{margin:15px 0;padding:15px;background:#f5f9ff;border:1px dashed #b7cce2;border-radius:13px}
-.signature{display:block;width:min(100%,620px);height:140px;border:1px solid #c4d5e7;border-radius:10px;background:linear-gradient(#fff,#fbfdff);touch-action:none;cursor:crosshair;box-shadow:inset 0 1px 4px #193e5b0b}
-.small{font-size:13px;color:var(--muted);overflow-wrap:anywhere}
-.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}
-.save{background:linear-gradient(135deg,#16865b,#0d6847)}.save:hover{box-shadow:0 7px 16px #147a5230}
-.clear{background:linear-gradient(135deg,#758397,#536276)}
-@media(max-width:600px){header{padding:17px}main{margin:14px auto;padding:0 10px 24px}.card{border-radius:14px;padding:15px}.record{padding:14px}.signature{height:120px}.row button{flex:1}}
+body{margin:0;color:var(--ink);font:16px/1.55 "Segoe UI",system-ui,Arial,sans-serif;background:radial-gradient(ellipse at 0% 0%,#d8efff 0,transparent 36%),radial-gradient(ellipse at 100% 18%,#f1ddff 0,transparent 30%),linear-gradient(135deg,#f6fbff,#fff8ef 55%,#f2f0ff)}
+header{position:relative;overflow:hidden;padding:25px clamp(18px,4vw,44px);color:#fff;background:linear-gradient(115deg,#092f55 0%,#126eb1 52%,#07988f 100%);box-shadow:0 8px 28px #123b6330}
+header:before,header:after{content:"";position:absolute;border:1px solid #ffffff42;border-radius:50%;width:210px;height:210px;right:8%;top:-145px;box-shadow:0 0 0 22px #ffffff0c,0 0 0 44px #ffffff0a}
+header:after{width:110px;height:110px;right:23%;top:26px}
+header b{font-size:clamp(18px,2vw,23px);letter-spacing:.4px}header div{font-size:14px;opacity:.94}
+main{max-width:1120px;margin:30px auto;padding:0 16px 42px}
+.card{position:relative;background:#ffffffed;border:1px solid #dbe7f4;border-radius:22px;padding:clamp(18px,3vw,30px);margin:18px 0;box-shadow:0 14px 38px #214b7514;backdrop-filter:blur(7px)}
+#work:before{content:"PARTICIPANT VERIFICATION WORKSPACE";display:inline-block;margin:0 0 15px;padding:7px 12px;border-radius:30px;background:linear-gradient(90deg,#e1f3ff,#efe8ff);color:#315d92;font-size:11px;font-weight:850;letter-spacing:1px}
+h2{margin:0 0 12px;color:#103e69;font-size:clamp(23px,3vw,30px)}
+#signin{margin:14px 0}
+.status{padding:13px 16px;border:1px solid #d4e5f8;border-left:5px solid #2783cb;border-radius:13px;background:linear-gradient(110deg,#e9f6ff,#f0edff);color:#20466b;white-space:pre-wrap;overflow-wrap:anywhere}
+.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+input,select,button{font:inherit;border-radius:11px;transition:all .18s ease}
+input,select{min-height:44px;padding:10px 13px;border:1px solid #bfd2e6;background:#fff;color:#203951;box-shadow:0 2px 5px #173c5d08}
+input:focus,select:focus{outline:none;border-color:#2985cf;box-shadow:0 0 0 4px #2985cf20}
+#q{width:min(100%,350px);flex:1}
+button{padding:11px 17px;border:0;background:linear-gradient(135deg,#167ac3,#164c84);color:#fff;font-weight:750;cursor:pointer;box-shadow:0 5px 12px #14578c28}
+button:hover{transform:translateY(-2px);filter:saturate(1.12);box-shadow:0 8px 18px #14578c35}
+button:disabled{opacity:.65;cursor:wait;transform:none}
+.record{position:relative;overflow:hidden;margin:18px 0;padding:22px;border:1px solid #dce7f4;border-radius:19px;background:linear-gradient(125deg,#fff 0%,#f5faff 58%,#faf6ff 100%);box-shadow:0 8px 22px #153d610d}
+.record:before{content:"";position:absolute;inset:0 auto 0 0;width:7px;background:linear-gradient(180deg,#20a5dc,#7063d9)}
+.record:nth-child(4n+2):before{background:linear-gradient(180deg,#10b8a0,#6dcf89)}
+.record:nth-child(4n+3):before{background:linear-gradient(180deg,#ffb24d,#f0787c)}
+.record:nth-child(4n):before{background:linear-gradient(180deg,#9b75e8,#e87db7)}
+.record h3{margin:0 0 6px;color:#123f69;font-size:21px;letter-spacing:.1px}
+.record>p:first-of-type{margin:4px 0 18px;color:#5a7088;font-size:14px}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:15px;margin:18px 0}
+.fields label,.sigwrap>label{display:block;color:#35536f;font-size:13px;font-weight:800;letter-spacing:.2px}
+.fields select{display:block;width:100%;margin-top:7px;border:1px solid #c5d7e9;background:linear-gradient(#fff,#f5faff)}
+.fields input{display:block;width:100%;margin-top:7px}
+.fields input[readonly]{background:#eaf4ff;color:#244d76;border-color:#c9e0f6;font-weight:650}
+.sigwrap{margin:20px 0 16px;padding:18px;border:1px solid #c9dff3;border-radius:17px;background:linear-gradient(135deg,#eaf7ff,#f5f0ff 75%,#fff9ed)}
+.sigwrap>label{margin-bottom:9px;font-size:14px;color:#234b73}
+.signature{display:block;width:min(100%,680px);height:155px;border:2px dashed #9ab9d8;border-radius:13px;background:repeating-linear-gradient(0deg,#fff,#fff 37px,#f1f6fc 38px,#fff 39px);touch-action:none;cursor:crosshair;box-shadow:inset 0 2px 8px #204b6b0c}
+.signature:hover{border-color:#4c91ca}
+.small{font-size:13px;color:#61768e;overflow-wrap:anywhere}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.save{background:linear-gradient(135deg,#16a66c,#08734d);box-shadow:0 5px 13px #08734d25}.save:hover{box-shadow:0 8px 18px #08734d35}
+.clear{background:linear-gradient(135deg,#77879b,#52657a)}
+@media(max-width:600px){header{padding:19px 16px}main{margin:14px auto;padding:0 10px 28px}.card{padding:16px;border-radius:16px}.record{padding:17px 14px 17px 19px;border-radius:15px}.record h3{font-size:18px}.signature{height:125px}.row button{flex:1}.fields{gap:11px}}
 </style></head><body><header><b>KENDRIYA VIDYALAYA SANGATHAN</b><div>ZIET Mumbai · Secure Official Verification</div></header><main><section class="card"><h2>Administrator sign-in</h2><p>Authorized account: <b>taprimaryzietmumbai@gmail.com</b></p><div id="signin"></div><p id="auth" class="status">Configure the Google OAuth Client ID to enable sign-in.</p></section><section id="work" class="card" hidden><div class="row"><input id="q" placeholder="Search participants"><button id="reload">Refresh</button><button id="logout">Sign out</button></div><p id="msg" class="status"></p><div id="records"></div></section></main><script>
 const API='https://script.google.com/macros/s/AKfycbw5xq8dvfMlaFE4Go6yIyFaCjRr2WMzyyS0bozW29LB3u9SNujZlfmbZAOCDrxIIwe4/exec';
 const CLIENT_ID='17397027972-tbgs73accf5jrfengoih738ppvsbdrf4.apps.googleusercontent.com';const ALLOWED='taprimaryzietmumbai@gmail.com';let idToken='',records=[];
