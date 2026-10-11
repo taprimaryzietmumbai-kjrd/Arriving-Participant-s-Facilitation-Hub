@@ -480,7 +480,7 @@ button.action{border:0;border-radius:11px;padding:13px 19px;font-size:15px;font-
         <div>
           <label class="icon-label"><span class="icon">📖</span>Name of the Course *</label>
           <input name="course" id="courseName" readonly placeholder="Loading course title from Google Sheet tab…" required aria-describedby="courseTitleStatus">
-          <small id="courseTitleStatus" class="note" role="status">Course title will be loaded from the selected Google Sheet tab.</small>
+          <small id="courseTitleStatus" class="note" role="status">Loading course title from the designated workshop Google Sheet…</small>
         </div>
         <div>
           <label class="icon-label"><span class="icon">🧑‍💼</span>Name of the Course Coordinator *</label>
@@ -623,6 +623,84 @@ n>
 
 <script>
 const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw5xq8dvfMlaFE4Go6yIyFaCjRr2WMzyyS0bozW29LB3u9SNujZlfmbZAOCDrxIIwe4/exec";
+
+const COURSE_SOURCE_SPREADSHEET_ID = "1Uuqoz2KFpTcw9d2HI02fLmFPopTaLnKWwZ9aR-uYCeY";
+const COURSE_SOURCE_TAB = "selectable";
+
+// Read the actual title/workshop value from the designated source sheet.
+// This is deliberately separate from the participant-list tab selector.
+function loadCourseTitleFromSourceSheet() {
+  const field = document.getElementById("courseName");
+  const status = document.getElementById("courseTitleStatus");
+  if (!field || !status) return;
+
+  const callbackName = "__zietCourseTitle_" + Date.now();
+  let script;
+  let finished = false;
+
+  function finish(message, success) {
+    if (finished) return;
+    finished = true;
+    try { delete window[callbackName]; } catch (e) {}
+    if (script && script.parentNode) script.parentNode.removeChild(script);
+    status.textContent = message;
+    status.style.color = success ? "#13763b" : "#a02222";
+  }
+
+  window[callbackName] = function (response) {
+    try {
+      if (!response || response.status === "error" || !response.table) {
+        finish("Could not read the workshop title from the Google Sheet. Check that the sheet is accessible by link.", false);
+        return;
+      }
+      const cols = response.table.cols || [];
+      const rows = response.table.rows || [];
+      const labels = cols.map(function (col) {
+        return String((col && (col.label || col.id)) || "").trim().toLowerCase();
+      });
+      const titleIndex = labels.findIndex(function (label) {
+        return /^(title|title of workshop|workshop title|course title)$/.test(label);
+      });
+      const workshopIndex = labels.findIndex(function (label) {
+        return /^(workshop \/ course|workshop|course|name of the course)$/.test(label);
+      });
+      const row = rows.find(function (item) {
+        return item && Array.isArray(item.c) && item.c.some(function (cell) {
+          return cell && String(cell.v == null ? cell.f || "" : cell.v).trim();
+        });
+      });
+      if (!row) {
+        finish("The source Google Sheet returned no title data.", false);
+        return;
+      }
+      function cellText(index) {
+        if (index < 0 || !row.c[index]) return "";
+        const cell = row.c[index];
+        return String(cell.v == null ? (cell.f || "") : cell.v).trim();
+      }
+      const title = cellText(titleIndex) || cellText(workshopIndex);
+      if (!title) {
+        finish("No Title or Workshop / Course value was found in the source tab.", false);
+        return;
+      }
+      field.value = title;
+      finish("Course title loaded automatically from the designated Google Sheet.", true);
+    } catch (error) {
+      finish("Could not process the title returned by Google Sheets.", false);
+    }
+  };
+
+  script = document.createElement("script");
+  script.onerror = function () {
+    finish("Google Sheet title could not be loaded. Verify that the source sheet is shared for viewing.", false);
+  };
+  script.src = "https://docs.google.com/spreadsheets/d/" +
+    COURSE_SOURCE_SPREADSHEET_ID +
+    "/gviz/tq?sheet=" + encodeURIComponent(COURSE_SOURCE_TAB) +
+    "&headers=1&tqx=" + encodeURIComponent("out:json;responseHandler:" + callbackName);
+  document.head.appendChild(script);
+}
+
 
 // Facilitator contacts are loaded live from the separate Google Sheet through Apps Script.
 // The spreadsheet's tab name and column positions are detected server-side from headers.
@@ -1982,41 +2060,20 @@ document.getElementById("form").addEventListener("submit", async function(e) {
           }
         );
 
-        const courseTitleInput = document.getElementById('courseName');
-        const courseTitleStatus = document.getElementById('courseTitleStatus');
-
-        function syncCourseTitleFromTab(sheetName) {
-          const title = String(sheetName || '').trim();
-          if (courseTitleInput) {
-            courseTitleInput.value = title;
-          }
-          if (courseTitleStatus) {
-            courseTitleStatus.textContent = title
-              ? 'Automatically loaded from Google Sheet tab: ' + title
-              : 'Select a Google Sheet tab to load its title automatically.';
-            courseTitleStatus.style.color = title ? '#13763b' : '#a02222';
-          }
-        }
-
         sheetSelector.addEventListener(
           'change',
           function () {
-            syncCourseTitleFromTab(sheetSelector.value);
             loadSheet(sheetSelector.value);
           }
         );
 
-        // Automatically select the first real tab returned by the spreadsheet,
-        // so the course title is populated without typing it into the form.
+        // Preserve automatic selection of the first participant-list tab.
         const firstSheet = data.sheets.find(function (name) {
           return String(name || '').trim().length > 0;
         });
         if (firstSheet) {
           sheetSelector.value = firstSheet;
-          syncCourseTitleFromTab(firstSheet);
           loadSheet(firstSheet);
-        } else {
-          syncCourseTitleFromTab('');
         }
 
       })
@@ -2034,6 +2091,8 @@ document.getElementById("form").addEventListener("submit", async function(e) {
   document.addEventListener(
     'DOMContentLoaded',
     function () {
+
+      loadCourseTitleFromSourceSheet();
 
       // Do not make external requests from
       // GitHub's built-in editor Preview.
