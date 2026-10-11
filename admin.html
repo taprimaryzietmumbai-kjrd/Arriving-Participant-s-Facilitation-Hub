@@ -1,5 +1,41 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ZIET Mumbai Admin Verification</title><script src="https://accounts.google.com/gsi/client" async defer></script><style>body{font:16px system-ui;background:#f2f5fa;margin:0;color:#17283d}header{background:#143d68;color:white;padding:20px}main{max-width:950px;margin:24px auto;padding:0 14px}.card{background:white;border:1px solid #dce4ef;border-radius:12px;padding:18px;margin:14px 0}.status{padding:10px;background:#edf3fb;border-radius:8px;white-space:pre-wrap}.row{display:flex;gap:8px;flex-wrap:wrap}input,button{font:inherit;padding:10px;border:1px solid #bdc9d9;border-radius:8px}button{cursor:pointer;background:#164d84;color:white}.record{padding:16px 0;border-top:1px solid #ddd}.record h3{margin:0 0 8px}.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin:12px 0}.fields label{display:block;font-size:13px;font-weight:600;margin-bottom:4px}.fields input,.fields select{width:100%;box-sizing:border-box}.sigwrap{margin:10px 0}.signature{display:block;width:min(100%,520px);height:130px;border:1px solid #9aabc0;border-radius:8px;background:#fff;touch-action:none}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.save{background:#147347}.clear{background:#5b6470}.small{font-size:13px;color:#53647a}</style></head><body><header><b>KENDRIYA VIDYALAYA SANGATHAN</b><div>ZIET Mumbai · Secure Official Verification</div></header><main><section class="card"><h2>Administrator sign-in</h2><p>Authorized account: <b>taprimaryzietmumbai@gmail.com</b></p><div id="signin"></div><p id="auth" class="status">Configure the Google OAuth Client ID to enable sign-in.</p></section><section id="work" class="card" hidden><div class="row"><input id="q" placeholder="Search participants"><button id="reload">Refresh</button><button id="logout">Sign out</button></div><p id="msg" class="status"></p><div id="records"></div></section></main><script>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ZIET Mumbai Admin Verification</title><script src="https://accounts.google.com/gsi/client" async defer></script><style>
+:root{--navy:#123b63;--blue:#1769aa;--sky:#eaf4ff;--teal:#087f8c;--purple:#7653b5;--ink:#1b2c42;--muted:#60738a;--line:#d9e5f2;--paper:#fff;--bg:#eef4fb;--green:#147a52;--shadow:0 12px 34px rgba(24,58,95,.10)}
+*{box-sizing:border-box}
+body{font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif;background:radial-gradient(circle at 12% 8%,#e0efff 0,transparent 32%),linear-gradient(135deg,#f4f7fc,#eaf1fa);margin:0;color:var(--ink)}
+header{background:linear-gradient(115deg,#10365d,#176ca0 65%,#168a91);color:white;padding:22px clamp(16px,3vw,34px);box-shadow:0 4px 18px #153d612b;position:relative;overflow:hidden}
+header:after{content:"";position:absolute;width:190px;height:190px;border:1px solid #ffffff38;border-radius:50%;right:6%;top:-110px;box-shadow:0 0 0 24px #ffffff0d,0 0 0 48px #ffffff0a}
+header b{font-size:clamp(17px,2vw,22px);letter-spacing:.35px}header div{opacity:.94;font-size:14px}
+main{max-width:1100px;margin:28px auto;padding:0 16px 36px}
+.card{background:var(--paper);border:1px solid #dce7f3;border-radius:18px;padding:clamp(16px,2.3vw,26px);margin:16px 0;box-shadow:var(--shadow)}
+h2{color:var(--navy);margin:0 0 12px;font-size:clamp(22px,3vw,29px)}
+p{margin:10px 0}
+#signin{margin:12px 0}
+.status{padding:12px 15px;background:linear-gradient(110deg,#edf5ff,#f1f0ff);border:1px solid #dce8fa;border-left:4px solid var(--blue);border-radius:11px;white-space:pre-wrap;overflow-wrap:anywhere;color:#1d4267}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+input,button,select{font:inherit;padding:11px 13px;border:1px solid #c8d7e8;border-radius:10px;transition:border-color .18s,box-shadow .18s,transform .18s}
+input,select{background:#fff;color:var(--ink);min-height:42px}
+input:focus,select:focus{outline:none;border-color:#2785ca;box-shadow:0 0 0 3px #2785ca24}
+#q{min-width:min(250px,100%);flex:1;max-width:360px}
+button{cursor:pointer;background:linear-gradient(135deg,#1769aa,#164d84);color:white;border:0;font-weight:650;box-shadow:0 3px 8px #164d8420}
+button:hover{transform:translateY(-1px);box-shadow:0 7px 16px #164d8430}
+button:disabled{opacity:.6;cursor:wait;transform:none}
+.record{padding:20px;margin:14px 0;border:1px solid var(--line);border-left:5px solid #3a87c8;border-radius:15px;background:linear-gradient(120deg,#fff,#f9fbff);box-shadow:0 4px 15px #153d610c}
+.record:nth-child(3n+2){border-left-color:#11a0a0}.record:nth-child(3n){border-left-color:#8a69c7}
+.record h3{margin:0 0 5px;color:#153f68;font-size:19px}
+.record>p:first-of-type{color:var(--muted);font-size:14px;margin:4px 0 14px}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));gap:14px;margin:16px 0}
+.fields label,.sigwrap>label{display:block;font-size:13px;font-weight:750;color:#3b536d;margin-bottom:6px;letter-spacing:.15px}
+.fields input,.fields select{display:block;width:100%;margin-top:5px}
+.fields input[readonly]{background:#f1f6fc;color:#526a82}
+.sigwrap{margin:15px 0;padding:15px;background:#f5f9ff;border:1px dashed #b7cce2;border-radius:13px}
+.signature{display:block;width:min(100%,620px);height:140px;border:1px solid #c4d5e7;border-radius:10px;background:linear-gradient(#fff,#fbfdff);touch-action:none;cursor:crosshair;box-shadow:inset 0 1px 4px #193e5b0b}
+.small{font-size:13px;color:var(--muted);overflow-wrap:anywhere}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}
+.save{background:linear-gradient(135deg,#16865b,#0d6847)}.save:hover{box-shadow:0 7px 16px #147a5230}
+.clear{background:linear-gradient(135deg,#758397,#536276)}
+@media(max-width:600px){header{padding:17px}main{margin:14px auto;padding:0 10px 24px}.card{border-radius:14px;padding:15px}.record{padding:14px}.signature{height:120px}.row button{flex:1}}
+</style></head><body><header><b>KENDRIYA VIDYALAYA SANGATHAN</b><div>ZIET Mumbai · Secure Official Verification</div></header><main><section class="card"><h2>Administrator sign-in</h2><p>Authorized account: <b>taprimaryzietmumbai@gmail.com</b></p><div id="signin"></div><p id="auth" class="status">Configure the Google OAuth Client ID to enable sign-in.</p></section><section id="work" class="card" hidden><div class="row"><input id="q" placeholder="Search participants"><button id="reload">Refresh</button><button id="logout">Sign out</button></div><p id="msg" class="status"></p><div id="records"></div></section></main><script>
 const API='https://script.google.com/macros/s/AKfycbw5xq8dvfMlaFE4Go6yIyFaCjRr2WMzyyS0bozW29LB3u9SNujZlfmbZAOCDrxIIwe4/exec';
 const CLIENT_ID='17397027972-tbgs73accf5jrfengoih738ppvsbdrf4.apps.googleusercontent.com';const ALLOWED='taprimaryzietmumbai@gmail.com';let idToken='',records=[];
 function say(id,t){document.getElementById(id).textContent=t}
