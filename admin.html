@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ZIET Mumbai Admin Verification</title><script src="https://accounts.google.com/gsi/client" async defer></script><style>body{font:16px system-ui;background:#f2f5fa;margin:0;color:#17283d}header{background:#143d68;color:white;padding:20px}main{max-width:950px;margin:24px auto;padding:0 14px}.card{background:white;border:1px solid #dce4ef;border-radius:12px;padding:18px;margin:14px 0}.status{padding:10px;background:#edf3fb;border-radius:8px;white-space:pre-wrap}.row{display:flex;gap:8px;flex-wrap:wrap}input,button{font:inherit;padding:10px;border:1px solid #bdc9d9;border-radius:8px}button{cursor:pointer;background:#164d84;color:white}.record{padding:12px 0;border-top:1px solid #ddd}</style></head><body><header><b>KENDRIYA VIDYALAYA SANGATHAN</b><div>ZIET Mumbai · Secure Official Verification</div></header><main><section class="card"><h2>Administrator sign-in</h2><p>Authorized account: <b>taprimaryzietmumbai@gmail.com</b></p><div id="signin"></div><p id="auth" class="status">Configure the Google OAuth Client ID to enable sign-in.</p></section><section id="work" class="card" hidden><div class="row"><input id="q" placeholder="Search participants"><button id="reload">Refresh</button><button id="logout">Sign out</button></div><p id="msg" class="status"></p><div id="records"></div></section></main><script>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ZIET Mumbai Admin Verification</title><script src="https://accounts.google.com/gsi/client" async defer></script><style>body{font:16px system-ui;background:#f2f5fa;margin:0;color:#17283d}header{background:#143d68;color:white;padding:20px}main{max-width:950px;margin:24px auto;padding:0 14px}.card{background:white;border:1px solid #dce4ef;border-radius:12px;padding:18px;margin:14px 0}.status{padding:10px;background:#edf3fb;border-radius:8px;white-space:pre-wrap}.row{display:flex;gap:8px;flex-wrap:wrap}input,button{font:inherit;padding:10px;border:1px solid #bdc9d9;border-radius:8px}button{cursor:pointer;background:#164d84;color:white}.record{padding:16px 0;border-top:1px solid #ddd}.record h3{margin:0 0 8px}.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin:12px 0}.fields label{display:block;font-size:13px;font-weight:600;margin-bottom:4px}.fields input,.fields select{width:100%;box-sizing:border-box}.sigwrap{margin:10px 0}.signature{display:block;width:min(100%,520px);height:130px;border:1px solid #9aabc0;border-radius:8px;background:#fff;touch-action:none}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.save{background:#147347}.clear{background:#5b6470}.small{font-size:13px;color:#53647a}</style></head><body><header><b>KENDRIYA VIDYALAYA SANGATHAN</b><div>ZIET Mumbai · Secure Official Verification</div></header><main><section class="card"><h2>Administrator sign-in</h2><p>Authorized account: <b>taprimaryzietmumbai@gmail.com</b></p><div id="signin"></div><p id="auth" class="status">Configure the Google OAuth Client ID to enable sign-in.</p></section><section id="work" class="card" hidden><div class="row"><input id="q" placeholder="Search participants"><button id="reload">Refresh</button><button id="logout">Sign out</button></div><p id="msg" class="status"></p><div id="records"></div></section></main><script>
 const API='https://script.google.com/macros/s/AKfycbw5xq8dvfMlaFE4Go6yIyFaCjRr2WMzyyS0bozW29LB3u9SNujZlfmbZAOCDrxIIwe4/exec';
 const CLIENT_ID='17397027972-tbgs73accf5jrfengoih738ppvsbdrf4.apps.googleusercontent.com';const ALLOWED='taprimaryzietmumbai@gmail.com';let idToken='',records=[];
 function say(id,t){document.getElementById(id).textContent=t}
@@ -7,6 +7,52 @@ function request(p){return new Promise((resolve,reject)=>{const cb='zietcb'+Date
 function signedIn(result){idToken=result.credential;try{const p=JSON.parse(atob(idToken.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));if(p.email.toLowerCase()!==ALLOWED||!p.email_verified)throw Error()}catch(e){idToken='';say('auth','Access denied. Sign in with '+ALLOWED);return}document.getElementById('work').hidden=false;say('auth','Signed in as '+ALLOWED);loadRecords()}
 function init(){if(!window.google?.accounts){setTimeout(init,250);return}google.accounts.id.initialize({client_id:CLIENT_ID,callback:signedIn});google.accounts.id.renderButton(document.getElementById('signin'),{theme:'outline',size:'large',text:'signin_with'})}window.addEventListener('load',init);
 async function loadRecords(){say('msg','Loading records…');try{const requestId='list-'+Date.now()+'-'+Math.random().toString(36).slice(2,12);await fetch(API,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'adminList',token:idToken,requestId})});let r={status:'pending'};for(let i=0;i<15;i++){await new Promise(resolve=>setTimeout(resolve,900));r=await request({action:'checkAdminList',rid:requestId});if(r.status!=='pending')break;}if(r.status==='pending')throw Error('The Apps Script did not return a result in time. Check that the latest Code.gs deployment is active.');if(!r.success)throw Error(r.error||'Could not load records');records=r.records||[];render();say('msg',records.length+' records loaded.')}catch(e){say('msg',e.message)}}
-function render(){const q=document.getElementById('q').value.toLowerCase(),host=document.getElementById('records');host.replaceChildren();records.filter(r=>[r.name,r.region,r.workshop].join(' ').toLowerCase().includes(q)).forEach(r=>{const d=document.createElement('div');d.className='record';const h=document.createElement('b');h.textContent=r.name||'Unnamed participant';const p=document.createElement('p');p.textContent=[r.region,r.workshop,'Row '+r.row].filter(Boolean).join(' · ');d.append(h,p);host.append(d)})}
+const STATUS_OPTIONS=['Yet to be done','YES','NO','Relieving Order not submitted','Payment not completed','Payment screenshot not made available'];
+function render(){
+ const q=document.getElementById('q').value.toLowerCase(),host=document.getElementById('records');host.replaceChildren();
+ records.filter(r=>[r.name,r.region,r.workshop,r.status,r.official].join(' ').toLowerCase().includes(q)).forEach(r=>{
+  const d=document.createElement('div');d.className='record';
+  const h=document.createElement('h3');h.textContent=r.name||'Unnamed participant';
+  const p=document.createElement('p');p.textContent=[r.region,r.workshop,'Spreadsheet row '+r.row].filter(Boolean).join(' · ');
+  const fields=document.createElement('div');fields.className='fields';
+  const statusLabel=document.createElement('label');statusLabel.textContent='Registration status';
+  const status=document.createElement('select');STATUS_OPTIONS.forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;status.append(o)});status.value=STATUS_OPTIONS.includes(r.status)?r.status:'Yet to be done';statusLabel.append(status);
+  const officialLabel=document.createElement('label');officialLabel.textContent='Verified by (signed-in administrator)';
+  const official=document.createElement('input');official.value=ALLOWED;official.readOnly=true;officialLabel.append(official);
+  fields.append(statusLabel,officialLabel);
+  const sigwrap=document.createElement('div');sigwrap.className='sigwrap';
+  const siglabel=document.createElement('label');siglabel.textContent='Official signature (draw with mouse or touch)';
+  const canvas=document.createElement('canvas');canvas.className='signature';canvas.width=900;canvas.height=225;canvas.setAttribute('aria-label','Draw official signature');
+  const ctx=canvas.getContext('2d');ctx.lineWidth=3;ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#102b4e';
+  let drawing=false,hasInk=false;
+  function point(ev){const b=canvas.getBoundingClientRect();return {x:(ev.clientX-b.left)*canvas.width/b.width,y:(ev.clientY-b.top)*canvas.height/b.height}}
+  canvas.addEventListener('pointerdown',ev=>{drawing=true;hasInk=true;canvas.setPointerCapture(ev.pointerId);const p=point(ev);ctx.beginPath();ctx.moveTo(p.x,p.y)});
+  canvas.addEventListener('pointermove',ev=>{if(!drawing)return;const p=point(ev);ctx.lineTo(p.x,p.y);ctx.stroke()});
+  ['pointerup','pointercancel','lostpointercapture'].forEach(n=>canvas.addEventListener(n,()=>drawing=false));
+  const note=document.createElement('p');note.className='small';note.textContent=r.official?'Previously verified by: '+r.official:'No previous official verification recorded.';
+  sigwrap.append(siglabel,canvas,note);
+  const actions=document.createElement('div');actions.className='actions';
+  const clear=document.createElement('button');clear.className='clear';clear.textContent='Clear signature';clear.onclick=()=>{ctx.clearRect(0,0,canvas.width,canvas.height);hasInk=false};
+  const save=document.createElement('button');save.className='save';save.textContent='Save verification';
+  const result=document.createElement('p');result.className='small';
+  save.onclick=()=>saveRecord(r,status.value,hasInk?canvas.toDataURL('image/png'):'',save,result);
+  actions.append(clear,save);d.append(h,p,fields,sigwrap,actions,result);host.append(d);
+ });
+}
+async function saveRecord(r,status,signature,button,result){
+ if(!confirm('Save verification for '+r.name+' (row '+r.row+')? This will update the official spreadsheet.'))return;
+ button.disabled=true;button.textContent='Saving…';result.textContent='Submitting verification…';
+ try{
+  const requestId='update-'+Date.now()+'-'+Math.random().toString(36).slice(2,10);
+  await fetch(API,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'adminUpdate',token:idToken,requestId,row:r.row,participantName:r.name,registrationStatus:status,officialSignature:signature})});
+  let out={status:'pending'};
+  for(let i=0;i<18;i++){await new Promise(resolve=>setTimeout(resolve,900));out=await request({action:'checkAdminUpdate',requestId});if(out.status!=='pending')break;}
+  if(out.status==='pending')throw Error('Save result timed out. Refresh and check the spreadsheet before retrying.');
+  if(!out.success)throw Error(out.error||'Verification could not be saved.');
+  result.textContent='Saved successfully. '+(out.signatureNote||'');
+  r.status=status;r.official=ALLOWED;render();
+  say('msg','Verification saved for '+r.name+'.');
+ }catch(e){result.textContent='Not confirmed: '+e.message;button.disabled=false;button.textContent='Save verification'}
+}
 document.getElementById('q').oninput=render;document.getElementById('reload').onclick=loadRecords;document.getElementById('logout').onclick=()=>{idToken='';records=[];document.getElementById('work').hidden=true;say('auth','Signed out. Reload to sign in again.')};
 </script></body></html>
