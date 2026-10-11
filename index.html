@@ -668,7 +668,7 @@ function loadCourseTitleFromSourceSheet(sheetName) {
       const cols = response.table.cols || [];
       const rows = response.table.rows || [];
       const labels = cols.map(function (col) {
-        return String((col && (col.label || col.id)) || "").trim().toLowerCase().replace(/\\s+/g, " ");
+        return String((col && (col.label || col.id)) || "").trim().toLowerCase().replace(/\s+/g, " ");
       });
       function cellText(row, index) {
         if (index < 0 || !row || !row.c || !row.c[index]) return "";
@@ -683,7 +683,7 @@ function loadCourseTitleFromSourceSheet(sheetName) {
         return found >= 0 ? found : fallbackIndex;
       }
       const titleColumn = findColumn([/^title$/, /^workshop \/ course name$/], 12);
-      const targetColumn = findColumn([/^target gp\\.?$/, /^target group$/, /^लक्ष्य समूह$/], -1);
+      const targetColumn = findColumn([/^target gp\.?$/, /^target group$/, /^लक्ष्य समूह$/], -1);
       const fromColumn = findColumn([/^from$/, /^start date$/, /^शुरू/], -1);
       const toColumn = findColumn([/^to$/, /^end date$/, /^समाप्त/], -1);
       const metadataRow = rows.find(function (item) {
