@@ -2120,7 +2120,6 @@ document.getElementById("form").addEventListener("submit", async function(e) {
           'change',
           function () {
             loadSheet(sheetSelector.value);
-            loadCourseTitleFromSourceSheet(sheetSelector.value);
           }
         );
 
@@ -2131,7 +2130,6 @@ document.getElementById("form").addEventListener("submit", async function(e) {
         if (firstSheet) {
           sheetSelector.value = firstSheet;
           loadSheet(firstSheet);
-          loadCourseTitleFromSourceSheet(firstSheet);
         }
 
       })
