@@ -740,19 +740,33 @@ function updateFacilitatorContact(name) {
   numberEl.textContent = contact.mobile ? 'Mobile / WhatsApp: ' + contact.mobile : 'Mobile / WhatsApp: not listed';
   emailEl.textContent = contact.email ? 'Email: ' + contact.email : 'Email: not listed';
   if (phone) {
-    const participantName = String(document.querySelector('[name="participant"]')?.value || '').trim();
-    const arrivalDate = String(document.querySelector('[name="arrivalDate"]')?.value || '').trim();
-    const arrivalTime = String(document.querySelector('[name="arrivalTime"]')?.value || '').trim();
-    const arrivalDetails = [
-      participantName ? 'Participant: ' + participantName : '',
-      arrivalDate ? 'Arrival date: ' + arrivalDate : '',
-      arrivalTime ? 'Arrival time: ' + arrivalTime : ''
-    ].filter(Boolean).join('\\n');
-    const message = 'Dear ' + contact.name + ', I am a participant attending the ZIET Mumbai training programme. I am contacting you regarding arrival facilitation.' + (arrivalDetails ? '\\n\\n' + arrivalDetails : '');
-    link.href = 'https://wa.me/' + phone + '?text=' + encodeURIComponent(message);
+    function buildArrivalWhatsAppUrl() {
+      const participantName = String(document.querySelector('[name="participant"]')?.value || '').trim();
+      const arrivalDate = String(document.querySelector('[name="arrivalDate"]')?.value || '').trim();
+      const arrivalTime = String(document.querySelector('[name="arrivalTime"]')?.value || '').trim();
+      const arrivalDetails = [
+        participantName ? 'Participant: ' + participantName : '',
+        arrivalDate ? 'Arrival date: ' + arrivalDate : '',
+        arrivalTime ? 'Arrival time: ' + arrivalTime : ''
+      ].filter(Boolean).join('\\n');
+      const message = 'Dear ' + contact.name + ', I am a participant attending the ZIET Mumbai training programme. I am contacting you regarding arrival facilitation.' + (arrivalDetails ? '\\n\\n' + arrivalDetails : '');
+      return 'https://wa.me/' + phone + '?text=' + encodeURIComponent(message);
+    }
+    link.href = buildArrivalWhatsAppUrl();
+    link.onclick = function() {
+      const participantName = String(document.querySelector('[name="participant"]')?.value || '').trim();
+      const arrivalDate = String(document.querySelector('[name="arrivalDate"]')?.value || '').trim();
+      const arrivalTime = String(document.querySelector('[name="arrivalTime"]')?.value || '').trim();
+      if (!participantName || !arrivalDate || !arrivalTime) {
+        alert('Please select the participant and fill in both Date of Arrival and Time of Arrival before opening WhatsApp.');
+        return false;
+      }
+      this.href = buildArrivalWhatsAppUrl();
+      return true;
+    };
     link.style.display = 'inline-block';
     link.textContent = 'Open WhatsApp';
-    note.textContent = 'WhatsApp will open with a prepared message. Review and send it yourself.';
+    note.textContent = 'WhatsApp message includes the selected participant and arrival date/time. Fill those fields before opening WhatsApp.';
   } else {
     link.removeAttribute('href');
     link.style.display = 'none';
