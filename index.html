@@ -589,29 +589,8 @@ n>
 
 <section class="section purple">
       <h2>✍️ Final Signatures</h2>
-      <p class="note">Both signatures can be drawn directly on the screen using a mouse, stylus or mobile touch screen.</p>
-      <div class="signature-grid">
-        <div class="signature-box">
-          <label>👤 Facilitator Name *</label>
-          <select name="facilitatorForSignature" id="facilitatorForSignature" class="facilitator-select" data-facilitator-select="true" required>
-            <option value="">-- Select Facilitator --</option>
-            <option value="Mrs. Seema Mishra">Mrs. Seema Mishra</option>
-            <option value="Mrs. Deepa Dilawari">Mrs. Deepa Dilawari</option>
-            <option value="Mrs. DEEPALI D KHADYE">Mrs. DEEPALI D KHADYE</option>
-            <option value="Mr. Shreyash Kamble">Mr. Shreyash Kamble</option>
-            <option value="Mr. Gajendra L. Kapde">Mr. Gajendra L. Kapde</option>
-            <option value="Mr. Nilesh Thangan">Mr. Nilesh Thangan</option>
-            <option value="Mr. Anand Kumar Srivastava">Mr. Anand Kumar Srivastava</option>
-            <option value="Dr. Rajesh Sharma">Dr. Rajesh Sharma</option>
-            <option value="Mrs. Joyce">Mrs. Joyce</option>
-          </select>
-          <label>✍️ Signature of the Facilitator</label>
-          <canvas id="facilitatorSignatureCanvas" class="signature-canvas"></canvas>
-          <input type="hidden" name="facilitatorSignature" id="facilitatorSignature">
-          <div class="signature-actions">
-            <button type="button" class="clear-signature" onclick="clearSignature('facilitator')">Clear Facilitator Signature</button>
-          </div>
-        </div>
+      <p class="note">The participant can draw their signature directly on the screen using a mouse, stylus or mobile touch screen. Official facilitator verification and signature are completed separately in the Admin Panel.</p>
+      <div class="signature-grid" style="grid-template-columns:1fr">
         <div class="signature-box">
           <label>✍️ Signature of the Participant</label>
           <canvas id="participantSignatureCanvas" class="signature-canvas"></canvas>
@@ -902,7 +881,6 @@ function addFamilyMember() {
   document.getElementById("familyRows").appendChild(row);
 }
 
-setupSignature("facilitatorSignatureCanvas", "facilitatorSignature");
 setupSignature("participantSignatureCanvas", "participantSignature");
 
 
@@ -1286,10 +1264,8 @@ document.getElementById("form").addEventListener("submit", async function(e) {
   const form = this;
   const btn = document.getElementById("submitBtn");
   const status = document.getElementById("status");
-  const facilitatorCanvas = document.getElementById("facilitatorSignatureCanvas");
   const participantCanvas = document.getElementById("participantSignatureCanvas");
 
-  document.getElementById("facilitatorSignature").value = facilitatorCanvas.toDataURL("image/png");
   document.getElementById("participantSignature").value = participantCanvas.toDataURL("image/png");
 
   function canvasHasInk(canvas) {
@@ -1299,9 +1275,9 @@ document.getElementById("form").addEventListener("submit", async function(e) {
     for (let i = 3; i < pixels.length; i += 4) if (pixels[i] > 0) return true;
     return false;
   }
-  if (!canvasHasInk(facilitatorCanvas) || !canvasHasInk(participantCanvas)) {
+  if (!canvasHasInk(participantCanvas)) {
     status.className = "status err"; status.style.display = "block";
-    status.textContent = "✍️ Please provide both the Facilitator and Participant signatures.";
+    status.textContent = "✍️ Please provide the Participant signature.";
     return;
   }
 
