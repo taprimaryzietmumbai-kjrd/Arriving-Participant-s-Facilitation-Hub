@@ -1426,6 +1426,12 @@ document.getElementById("form").addEventListener("submit", async function(e) {
     const result = await checkSubmissionStatus(requestId, 30000);
     status.className = "status ok";
     status.textContent = '✅ ' + (result.message || 'Record saved successfully.') + (result.row ? ' Spreadsheet row: ' + result.row + '.' : '');
+    showPaymentScreenshotUpload({
+      participantName: data.participant || data.applicantName || 'Participant',
+      workshop: data.course || data.trainingProgramme || '',
+      spreadsheetRow: result.row || '',
+      requestId: requestId
+    });
     form.reset();
     clearSignature("facilitator"); clearSignature("participant");
     updateFacilitatorContact('');
@@ -1436,6 +1442,84 @@ document.getElementById("form").addEventListener("submit", async function(e) {
     btn.disabled = false;
   }
 });
+
+// ===== OPTIONAL PAYMENT SCREENSHOT UPLOAD AFTER SUCCESSFUL SUBMISSION =====
+function showPaymentScreenshotUpload(record) {
+  const old = document.getElementById('paymentScreenshotPanel');
+  if (old) old.remove();
+  const panel = document.createElement('section');
+  panel.id = 'paymentScreenshotPanel';
+  panel.className = 'section orange';
+  panel.style.cssText = 'display:block;margin:18px 0;padding:20px;border:2px solid #f59e0b;border-radius:14px;background:#fffaf0';
+  const heading = document.createElement('h2');
+  heading.textContent = '📤 Upload Payment Screenshot';
+  panel.appendChild(heading);
+  const note = document.createElement('p');
+  note.textContent = 'Your form has been submitted. If payment has been made, select the payment screenshot (PNG, JPG, JPEG or PDF) and send it to ZIET Mumbai.';
+  panel.appendChild(note);
+  const input = document.createElement('input');
+  input.type = 'file'; input.id = 'paymentScreenshotFile';
+  input.accept = 'image/png,image/jpeg,application/pdf';
+  input.style.cssText = 'display:block;width:100%;max-width:520px;margin:12px 0';
+  panel.appendChild(input);
+  const button = document.createElement('button');
+  button.type = 'button'; button.className = 'action submit';
+  button.textContent = '📧 Send Payment Screenshot';
+  const status = document.createElement('p');
+  status.className = 'status'; status.style.display = 'none';
+  panel.append(button,status);
+  button.addEventListener('click', async () => {
+    const file = input.files && input.files[0];
+    if (!file) { status.className='status err'; status.style.display='block'; status.textContent='Please choose a payment screenshot or PDF first.'; return; }
+    if (file.size > 8 * 1024 * 1024) { status.className='status err'; status.style.display='block'; status.textContent='File is larger than 8 MB. Please select a smaller file.'; return; }
+    button.disabled = true; status.className='status'; status.style.display='block'; status.textContent='Uploading and emailing screenshot…';
+    try {
+      const dataUrl = await new Promise((resolve,reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result || ''));
+        reader.onerror = () => reject(new Error('Could not read the selected file.'));
+        reader.readAsDataURL(file);
+      });
+      const uploadId = 'payment-' + Date.now() + '-' + Math.random().toString(36).slice(2,10);
+      await fetch(GOOGLE_APPS_SCRIPT_URL, {
+        method:'POST', mode:'no-cors',
+        headers:{'Content-Type':'text/plain;charset=utf-8'},
+        body:JSON.stringify({
+          action:'paymentScreenshot', requestId:uploadId,
+          participantName:record.participantName, workshop:record.workshop,
+          spreadsheetRow:record.spreadsheetRow, submissionRequestId:record.requestId,
+          fileName:file.name, mimeType:file.type || 'application/octet-stream', fileData:dataUrl
+        })
+      });
+      let result={status:'pending'};
+      for(let i=0;i<20;i++){
+        await new Promise(resolve=>setTimeout(resolve,900));
+        result=await checkPaymentScreenshotStatus(uploadId);
+        if(result.status!=='pending') break;
+      }
+      if(result.status!=='success' || !result.success) throw new Error(result.error || result.message || 'The server did not confirm the screenshot email. Please contact ZIET Mumbai before trying again.');
+      status.className='status ok'; status.textContent='✅ Payment screenshot emailed to taprimaryzietmumbai@gmail.com and zietmumstaff@gmail.com.';
+      input.disabled=true;
+    } catch(err) {
+      status.className='status err'; status.textContent='⚠️ ' + (err && err.message ? err.message : String(err));
+    } finally { button.disabled=false; }
+  });
+  const form=document.getElementById('form');
+  form.insertAdjacentElement('afterend',panel);
+  panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function checkPaymentScreenshotStatus(requestId) {
+  return new Promise((resolve,reject)=>{
+    const callback='zietPaymentCB'+Date.now()+Math.random().toString(36).slice(2,7);
+    const script=document.createElement('script');
+    const timer=setTimeout(()=>{delete window[callback];script.remove();resolve({status:'pending'});},5000);
+    window[callback]=result=>{clearTimeout(timer);delete window[callback];script.remove();resolve(result||{status:'pending'});};
+    script.onerror=()=>{clearTimeout(timer);delete window[callback];script.remove();resolve({status:'pending'});};
+    script.src=GOOGLE_APPS_SCRIPT_URL+'?'+new URLSearchParams({action:'checkPaymentScreenshot',requestId:requestId,callback:callback});
+    document.head.appendChild(script);
+  });
+}
+
 // ===== LIVE PARTICIPANT LIST FROM GOOGLE SHEET =====
 // Live participant list from Google Sheet.
 // Sheet selection controls which participants are displayed.
