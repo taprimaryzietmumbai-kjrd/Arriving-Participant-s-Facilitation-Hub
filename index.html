@@ -330,32 +330,19 @@ button.action{border:0;border-radius:11px;padding:13px 19px;font-size:15px;font-
           <div class="note">Select the hostel allottee / arriving participant from the feeder-region list.</div>
         </div>
         <div>
-          <label>🏢 Block No. *</label>
-          <select name="block" required>
-            <option value="">-- Select Block --</option>
-            <option>A1</option>
-            <option>A2</option>
-            <option>A3</option>
-          </select>
+          <label>🏢 Hostel Block Allotted (from approved spreadsheet)</label>
+          <input name="block" id="allottedHostelBlock" type="text" readonly
+                 placeholder="Select participant to load allotted block"
+                 aria-readonly="true">
         </div>
         <div>
-          <label>🚪 Room No. *</label>
-          <select name="room" required>
-            <option value="">-- Select Room No. --</option>
-            <option>1</option>
-            <option>2</option>
-            <option>3</option>
-            <option>4</option>
-            <option>5</option>
-            <option>6</option>
-            <option>7</option>
-            <option>8</option>
-            <option>9</option>
-            <option>10</option>
-            <option>11</option>
-            <option>12</option>
-            
-          </select>
+          <label>🚪 Hostel Room Allotted (from approved spreadsheet)</label>
+          <input name="room" id="allottedHostelRoom" type="text" readonly
+                 placeholder="Select participant to load allotted room"
+                 aria-readonly="true">
+        </div>
+        <div class="full note" id="hostelAllotmentStatus" aria-live="polite">
+          Block and room will be filled automatically from columns AJ and AK of the approved hostel allotment spreadsheet.
         </div>
         <div>
           <label>📅 Date of Arrival *</label>
@@ -1834,12 +1821,81 @@ function checkPaymentScreenshotStatus(requestId) {
   }
 
 
-  // Participant → Designation → Region → KV → KV details.
+  // Read the approved hostel allotment values exposed by the participant
+  // spreadsheet API. The source columns are AJ (block) and AK (room).
+  function getAllotmentField(person, acceptedKeys) {
+    if (!person || typeof person !== 'object') return { found: false, value: '' };
+    const normaliseKey = value => String(value || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    const wanted = acceptedKeys.map(normaliseKey);
+    const keys = Object.keys(person);
+    for (const wantedKey of wanted) {
+      const actualKey = keys.find(key => normaliseKey(key) === wantedKey);
+      if (actualKey !== undefined && person[actualKey] !== null && person[actualKey] !== undefined) {
+        return { found: true, value: String(person[actualKey]).trim() };
+      }
+    }
+    return { found: false, value: '' };
+  }
+
+  function clearHostelAllotment(message) {
+    const blockField = document.getElementById('allottedHostelBlock');
+    const roomField = document.getElementById('allottedHostelRoom');
+    const status = document.getElementById('hostelAllotmentStatus');
+    if (blockField) blockField.value = '';
+    if (roomField) roomField.value = '';
+    if (status) {
+      status.textContent = message || 'Select a participant to load the approved hostel allotment.';
+      status.style.color = '#64748b';
+    }
+  }
+
+  function applyHostelAllotment(person) {
+    const blockField = document.getElementById('allottedHostelBlock');
+    const roomField = document.getElementById('allottedHostelRoom');
+    const status = document.getElementById('hostelAllotmentStatus');
+    if (!blockField || !roomField) return;
+
+    const block = getAllotmentField(person, [
+      'Hostel Block Allotted',
+      'hostelBlockAllotted',
+      'hostelBlock',
+      'allottedBlock',
+      'block'
+    ]);
+    const room = getAllotmentField(person, [
+      'Hostel Room Allotted',
+      'hostelRoomAllotted',
+      'hostelRoom',
+      'allottedRoom',
+      'room'
+    ]);
+
+    blockField.value = block.found ? block.value : '';
+    roomField.value = room.found ? room.value : '';
+
+    if (block.found || room.found) {
+      if (status) {
+        const source = String(person.sourceSheet || 'approved participant spreadsheet').trim();
+        status.textContent = '✓ Hostel allotment loaded from ' + source + '. These values are read-only and cannot be changed by participants.';
+        status.style.color = '#13763b';
+      }
+    } else {
+      if (status) {
+        status.textContent = '⚠ Allotment columns AJ (block) and AK (room) were not present in the participant data returned for this person. Please ensure the participant API includes these two spreadsheet columns; no room has been guessed.';
+        status.style.color = '#a02222';
+      }
+    }
+  }
+
+  // Participant → Designation → Region → KV → KV details + approved hostel allotment.
   function autoFillParticipant(person) {
 
     if (!person) {
+      clearHostelAllotment();
       return;
     }
+
+    applyHostelAllotment(person);
 
     const designation =
       document.querySelector(
@@ -1964,6 +2020,7 @@ function checkPaymentScreenshotStatus(requestId) {
               ).trim();
 
             if (!selectedName) {
+              clearHostelAllotment();
               return;
             }
 
