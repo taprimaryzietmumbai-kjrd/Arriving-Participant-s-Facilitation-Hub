@@ -595,13 +595,24 @@ n>
     <section class="section purple">
       <h2>🚀 Submit &amp; Central Record</h2>
       <p class="note">On submission, the entry is sent to the Google Sheet connected through your Google Apps Script Web App.</p>
-      <div class="actions document-actions" aria-label="Print and PDF options">
+      <div class="actions document-actions" aria-label="Print, PDF and submission options">
         <button class="action print-action" type="button" onclick="printForm()">🖨️ Print</button>
         <button class="action pdf-action" type="button" onclick="saveAsPDF()">📄 Save as PDF</button>
+        <button class="action" id="saveDrivePdfBtn" type="button" style="background:#087a59;color:#fff" onclick="savePDFToGoogleDrive()">☁️ Save PDF to Google Drive</button>
         <button class="action submit" id="submitBtn" type="submit">🚀 Submit Schedule to Google Sheet</button>
         <button class="action reset" type="reset">↻ Clear Form</button>
       </div>
       <div id="status" class="status"></div>
+      <div class="section orange" style="margin-top:18px">
+        <h2>📤 Upload Relieving Order</h2>
+        <p class="note">Participants may upload their official Relieving Order (PDF, JPG or PNG; maximum 8 MB). This upload is separate from the arrival-form submission.</p>
+        <label for="relievingOrderFile">Select Relieving Order</label>
+        <input id="relievingOrderFile" type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png">
+        <div class="actions">
+          <button class="action submit" id="uploadRelievingOrderBtn" type="button" onclick="uploadRelievingOrder()">📤 Upload Relieving Order to Google Drive</button>
+        </div>
+        <div id="relievingOrderStatus" class="status" role="status" aria-live="polite"></div>
+      </div>
     </section>
   </form>
 </main>
@@ -609,6 +620,7 @@ n>
 <footer class="footer">
   KVS ZIET Mumbai • Participant Arrival Facilitation • Learn • Connect • Collaborate • Grow
 </footer>
+<iframe name="relievingOrderUploadFrame" id="relievingOrderUploadFrame" title="Relieving Order upload response" style="display:none"></iframe>
 
 <script>
 const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw5xq8dvfMlaFE4Go6yIyFaCjRr2WMzyyS0bozW29LB3u9SNujZlfmbZAOCDrxIIwe4/exec";
@@ -1327,9 +1339,158 @@ function printForm() {
 }
 
 function saveAsPDF() {
-  // Opens the browser print dialog; choose “Save as PDF” as the destination.
+  // Local PDF option: opens the browser print dialog.
   window.print();
 }
+
+function checkArrivalPdfStatus(requestId, timeoutMs) {
+  return new Promise(function(resolve, reject) {
+    const started = Date.now();
+    function poll() {
+      const callbackName = '__arrivalPdfStatus_' + Math.random().toString(36).slice(2);
+      const script = document.createElement('script');
+      function cleanup() { try { delete window[callbackName]; } catch(e) {} script.remove(); }
+      const timer = setTimeout(function() {
+        cleanup();
+        if (Date.now() - started >= timeoutMs) reject(new Error('Google Drive did not confirm the PDF save.'));
+        else setTimeout(poll, 1000);
+      }, 7000);
+      window[callbackName] = function(result) {
+        clearTimeout(timer); cleanup();
+        if (result && result.status === 'saved') resolve(result);
+        else if (result && result.status === 'error') reject(new Error(result.message || 'Google Drive save failed.'));
+        else if (Date.now() - started >= timeoutMs) reject(new Error('Google Drive save could not be verified.'));
+        else setTimeout(poll, 1000);
+      };
+      script.onerror = function() {
+        clearTimeout(timer); cleanup();
+        if (Date.now() - started >= timeoutMs) reject(new Error('Could not verify the PDF save with Google Apps Script.'));
+        else setTimeout(poll, 1000);
+      };
+      script.src = GOOGLE_APPS_SCRIPT_URL + '?action=checkDrivePdf&requestId=' + encodeURIComponent(requestId) + '&callback=' + callbackName + '&_=' + Date.now();
+      document.head.appendChild(script);
+    }
+    poll();
+  });
+}
+
+async function savePDFToGoogleDrive() {
+  const button = document.getElementById('saveDrivePdfBtn');
+  const status = document.getElementById('status');
+  const form = document.getElementById('form');
+  const participantName = String(form.querySelector('[name="participant"]')?.value || form.querySelector('[name="applicantName"]')?.value || 'Participant').trim();
+  const employeeCode = String(form.querySelector('[name="employeeCode"]')?.value || '').trim();
+  const workshop = String(document.getElementById('courseName')?.value || document.getElementById('dynamicWorkshopTitle')?.textContent || '').trim();
+  const fields = Array.from(new FormData(form).entries())
+    .filter(([name, value]) => name && value && !/signature|base64|file/i.test(name))
+    .map(([name, value]) => ({
+      label: name.replace(/([A-Z])/g, ' $1').replace(/[_-]/g, ' ').replace(/^./, c => c.toUpperCase()),
+      value: String(value).trim()
+    }))
+    .filter(item => item.value);
+  const requestId = 'arrival-pdf-' + Date.now() + '-' + Math.random().toString(36).slice(2, 9);
+  button.disabled = true;
+  status.className = 'status'; status.style.display = 'block';
+  status.textContent = '⏳ Creating the PDF and saving it to the designated Google Drive folder…';
+  try {
+    await fetch(GOOGLE_APPS_SCRIPT_URL, {
+      method: 'POST', mode: 'no-cors',
+      headers: {'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify({
+        action: 'saveArrivalPdf', requestId: requestId,
+        participantName: participantName, employeeCode: employeeCode,
+        workshop: workshop, fields: fields
+      })
+    });
+    const result = await checkArrivalPdfStatus(requestId, 45000);
+    status.className = 'status ok';
+    status.textContent = '✅ ' + (result.message || 'PDF saved to Google Drive.') + ' ';
+    if (result.url) {
+      const link = document.createElement('a');
+      link.href = result.url; link.target = '_blank'; link.rel = 'noopener';
+      link.textContent = 'Open saved PDF';
+      status.appendChild(link);
+    }
+  } catch (error) {
+    status.className = 'status err';
+    status.textContent = '⚠️ ' + (error.message || 'PDF could not be saved to Google Drive.');
+  } finally {
+    button.disabled = false;
+  }
+}
+
+const RELIEVING_ORDER_UPLOAD_ENDPOINT = 'https://script.google.com/macros/s/AKfycby6GR_lWuqdcIHKsyfmJmgCaCXphZ0tFQ4iVjfsKT13Y1EvREe4s5ttx9bJ23CNrgYkrQ/exec';
+let pendingRelievingUpload = null;
+
+function uploadRelievingOrder() {
+  const fileInput = document.getElementById('relievingOrderFile');
+  const button = document.getElementById('uploadRelievingOrderBtn');
+  const status = document.getElementById('relievingOrderStatus');
+  const file = fileInput.files && fileInput.files[0];
+  const participantName = String(document.querySelector('[name="participant"]')?.value || '').trim();
+  const employeeCode = String(document.querySelector('[name="employeeCode"]')?.value || '').trim();
+  if (!participantName) {
+    status.className = 'status err'; status.style.display = 'block';
+    status.textContent = 'Please select the participant name first.'; return;
+  }
+  if (!file) {
+    status.className = 'status err'; status.style.display = 'block';
+    status.textContent = 'Please choose the Relieving Order file.'; return;
+  }
+  if (file.size > 8 * 1024 * 1024) {
+    status.className = 'status err'; status.style.display = 'block';
+    status.textContent = 'The file exceeds the 8 MB limit.'; return;
+  }
+  if (!['application/pdf','image/jpeg','image/png'].includes(file.type)) {
+    status.className = 'status err'; status.style.display = 'block';
+    status.textContent = 'Only PDF, JPG and PNG files are accepted.'; return;
+  }
+  button.disabled = true;
+  status.className = 'status'; status.style.display = 'block';
+  status.textContent = '⏳ Uploading Relieving Order to Google Drive…';
+  const reader = new FileReader();
+  reader.onerror = function() {
+    button.disabled = false; status.className = 'status err';
+    status.textContent = 'The selected file could not be read.';
+  };
+  reader.onload = function() {
+    const token = 'arrival-relieving-' + Date.now() + '-' + Math.random().toString(36).slice(2, 9);
+    pendingRelievingUpload = {token:token, button:button, status:status};
+    const payload = {
+      token:token, participantName:participantName, employeeCode:employeeCode,
+      mobile:String(document.querySelector('[name="mobile"]')?.value || '').trim(),
+      fileName:participantName.replace(/[^a-z0-9]+/gi,'_') + '_Relieving_Order_' + file.name.replace(/[\\/:*?"<>|]/g,'_'),
+      mimeType:file.type, fileData:String(reader.result || '').split(',')[1] || '',
+      documentType:'Relieving Order',
+      training:String(document.getElementById('courseName')?.value || 'ZIET Mumbai Workshop')
+    };
+    const frame = document.getElementById('relievingOrderUploadFrame');
+    const postForm = document.createElement('form');
+    postForm.method = 'POST'; postForm.action = RELIEVING_ORDER_UPLOAD_ENDPOINT;
+    postForm.target = frame.name; postForm.style.display = 'none';
+    const field = document.createElement('input'); field.name = 'payload'; field.value = JSON.stringify(payload);
+    postForm.appendChild(field); document.body.appendChild(postForm); postForm.submit(); postForm.remove();
+    setTimeout(function() {
+      if (pendingRelievingUpload && pendingRelievingUpload.token === token) {
+        pendingRelievingUpload = null; button.disabled = false;
+        status.className = 'status err';
+        status.textContent = 'No upload confirmation was received. Check the Drive folder before trying again.';
+      }
+    }, 60000);
+  };
+  reader.readAsDataURL(file);
+}
+
+window.addEventListener('message', function(event) {
+  const data = event.data;
+  if (!data || data.type !== 'RELIEVING_ORDER_UPLOAD_RESULT' || !pendingRelievingUpload || data.token !== pendingRelievingUpload.token) return;
+  const pending = pendingRelievingUpload; pendingRelievingUpload = null;
+  pending.button.disabled = false;
+  pending.status.className = data.ok ? 'status ok' : 'status err';
+  pending.status.textContent = data.ok
+    ? '✅ Relieving Order uploaded successfully to Google Drive for ' + String(document.querySelector('[name="participant"]')?.value || 'the selected participant') + '.'
+    : '⚠️ ' + (data.message || 'Relieving Order upload failed.');
+});
 
 function checkSubmissionStatus(requestId, timeoutMs) {
   return new Promise(function(resolve, reject) {
